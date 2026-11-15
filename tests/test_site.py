@@ -18,7 +18,7 @@ import pytest
 import run
 from revrec.revenue import revenue_by
 from revrec.rollforwards import MONTHS, closing
-from revrec.site import POSITIONS, REPO, memo_sections, money
+from revrec.site import ABOUT, INTRO, POSITIONS, REPO, memo_sections
 
 D = Decimal
 ROOT = Path(__file__).parent.parent
@@ -123,16 +123,22 @@ def test_charts_and_waterfall(quarter):
 
 # --- 2. Every dollar figure on the page is a model fact -------------------------------------------
 
+def without_about(page_html):
+    """The About me section is biography, not model output, so it's checked word for word instead."""
+    return re.sub(r'<section id="about">.*?</section>', " ", page_html, flags=re.S)
+
+
 def test_every_dollar_figure_on_the_page_comes_from_the_model(quarter, page):
+    """Every $ figure (with or without cents, unit prices included) equals a model fact."""
     facts = quarter["site"]["facts"]
-    allowed = {money(v) for v in all_values(facts)} | {money(v, sign=True) for v in all_values(facts)}
-    allowed |= {money(0)}
-    shown = re.findall(r"[−+]?\$[\d,]+\.\d{2}", visible_text(page))
+    allowed = {abs(v) for v in all_values(facts)}
+    shown = re.findall(r"[−+]?\$\d[\d,]*(?:\.\d+)?", visible_text(without_about(page)))
     assert len(shown) > 50
-    assert [figure for figure in shown if figure not in allowed] == []
-    # And the headline figures are really there.
-    for figure in ["$55,352.25", "$0.00", "$6,975.00", "−$525.00", "$6,450.00", "−$1,500.00", "$4,950.00",
-                   "$21,725.00", "$18,927.25", "$1,525.00", "$1,000.00"]:
+    values = {figure: D(figure.lstrip("−+$").replace(",", "")) for figure in shown}
+    assert [figure for figure, value in values.items() if value not in allowed] == []
+    # And the key figures are really there.
+    for figure in ["$0.00", "$6,975.00", "−$525.00", "$6,450.00", "−$1,500.00", "$4,950.00", "$21,725.00",
+                   "$18,927.25", "$1,525.00", "$1,000.00", "$0.005", "$525"]:
         assert figure in shown, figure
 
 
@@ -151,15 +157,48 @@ def test_chart_data_matches_the_model(quarter, page):
 
 # --- 3. Text, cards, links, and the CDN pin --------------------------------------------------------
 
-def test_tiles_intro_and_footer(page):
-    text = " ".join(visible_text(page).split())
+def flat(page_html):
+    return " ".join(visible_text(page_html, drop_memo=False).split())
+
+
+def test_headline_intro_and_tiles(page):
+    hero = flat(re.search(r'<header class="hero">.*?</header>', page, re.S).group(0))
+    assert "Usage-based revenue, closed and reconciled." in hero
+    assert INTRO in hero
+    tiles = re.findall(r'<div class="tile">(.*?)</div>\s*</div>', page, re.S)
+    assert [" ".join(visible_text(t).split()) for t in tiles] == [
+        "$0.00 unexplained difference in every reconciliation (12 bridges, 3 months)",
+        "8 of 8 controls pass, every month",
+        "7 judgment calls documented",
+    ]
+    assert "Q1 revenue" not in hero
+    assert "Every number on this page is checked by the test suite." in hero
+
+
+def test_cap_line_follows_the_billing_limit_example(page):
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    why = re.search(r"\*\*Why I built this:\*\*\s*(.+)", readme).group(1).strip()
-    assert why in text
-    assert "Usage-based revenue, closed and reconciled." in text
-    assert "8 of 8 controls pass, every month" in text
-    assert "Every number on this page is checked by the test suite." in text
-    assert "Jonah Rice, CPA" in text
+    cap_line = re.search(r"\*\*Why I built this:\*\*\s*(.+)", readme).group(1).split(". ", 1)[1].strip()
+    assert "$525 billing cap refuse to become revenue" in cap_line
+    business = flat(re.search(r'<section id="business">.*?</section>', page, re.S).group(0))
+    assert business.index("Billed and recognized") < business.index(cap_line)
+    assert cap_line not in flat(re.search(r'<header class="hero">.*?</header>', page, re.S).group(0))
+
+
+def test_sections_in_order(page):
+    ids = re.findall(r'<section id="([^"]+)"', page)
+    assert ids == ["business", "judgment", "dollar", "reconciliation", "charts", "close", "built", "about"]
+    eyebrows = re.findall(r'<p class="eyebrow">(\d+) · ', page)
+    assert eyebrows == [str(n) for n in range(1, 9)]
+
+
+def test_no_spec_references_on_the_page(page):
+    assert re.search(r"SPEC \d", flat(page)) is None
+
+
+def test_about_me_and_footer(page):
+    about = flat(re.search(r'<section id="about">.*?</section>', page, re.S).group(0))
+    assert about == "8 · About me Jonah Rice, CPA " + ABOUT
+    assert "Jonah Rice, CPA" in flat(re.search(r"<footer>.*?</footer>", page, re.S).group(0))
 
 
 def test_judgment_cards_come_from_memo(page):

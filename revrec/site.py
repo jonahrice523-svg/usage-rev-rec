@@ -45,7 +45,7 @@ POSITIONS = [
 
 # Where a card's policy goes further than the model, say what the model actually does.
 MODEL_NOTES = {
-    4: "In the model: unusual items are tested against the current month's revenue only (SPEC 3.2). "
+    4: "In the model: unusual items are tested against the current month's revenue only. "
        "Checking both months is the policy I'd adopt.",
 }
 
@@ -184,6 +184,7 @@ def memo_sections(memo_text):
 
 def readme_parts(readme_text):
     why = re.search(r"\*\*Why I built this:\*\*\s*(.+)", readme_text).group(1).strip()
+    cap_line = why.split(". ", 1)[1]  # "Reading the guidance is one thing. Watching a $525 billing cap ..."
     how = readme_text.split("## How I built this", 1)[1].split("\n## ", 1)[0].strip()
     table = readme_text.split("## Three customers", 1)[1].split("\n## ", 1)[0]
     customers = []
@@ -191,7 +192,7 @@ def readme_parts(readme_text):
         cells = [c.strip() for c in row.strip().strip("|").split("|")]
         if len(cells) == 3 and cells[0] in CUSTOMERS.values():
             customers.append(cells)
-    return {"why": why, "how": how, "customers": customers}
+    return {"why": why, "cap_line": cap_line, "how": how, "customers": customers}
 
 
 # --- HTML -----------------------------------------------------------------------------------------
@@ -213,22 +214,31 @@ def no_entry(reason):
     return f'<div class="je je-none"><strong>No journal entry.</strong> {reason}</div>'
 
 
-def section_hero(f, text):
+INTRO = ("A full quarter of usage-based revenue accounting for a fictional company, from raw usage to "
+         "reconciled GL, built to show how I’d run revenue accounting at a usage-billed business. Built over "
+         "one weekend, spec first, with Claude Code.")
+
+ABOUT = ("Previously acting controller at a $16M ARR SaaS company, where I ran an accrued-revenue workflow for "
+         "pay-as-you-go revenue, posted revenue from Chargebee into QuickBooks, and was the main contact for our "
+         "auditors. Started at PwC in audit.")
+
+
+def section_hero(f, sections):
     return f"""
 <header class="hero">
   <p class="eyebrow">Hedgehog Metrics, Inc. · Q1 2026 · synthetic data</p>
   <h1>Usage-based revenue, closed and reconciled.</h1>
-  <p class="lede">{inline(text["why"])}</p>
+  <p class="lede">{esc(INTRO)}</p>
   <div class="tiles">
-    <div class="tile"><div class="tile-value">{money(f["q1_revenue"])}</div>
-      <div class="tile-label">Q1 revenue, January–March 2026</div></div>
     <div class="tile"><div class="tile-value">{money(f["largest_unexplained"])}</div>
       <div class="tile-label">unexplained difference in every reconciliation
         ({f["bridge_count"]} bridges, 3 months)</div></div>
     <div class="tile"><div class="tile-value">{controls_passing(f)} of {len(f["controls"][MONTHS[0]])}</div>
-      <div class="tile-label">controls pass, every month</div>
-      <div class="tile-note">Every number on this page is checked by the test suite.</div></div>
+      <div class="tile-label">controls pass, every month</div></div>
+    <div class="tile"><div class="tile-value">{len(sections)}</div>
+      <div class="tile-label">judgment calls documented</div></div>
   </div>
+  <p class="tile-note">Every number on this page is checked by the test suite.</p>
 </header>"""
 
 
@@ -264,14 +274,15 @@ def section_business(f, text):
         f"<p>{inline(shows)}.</p></div>" for name, plan, shows in text["customers"])
     return f"""
 <section id="business">
-  <p class="eyebrow">1 · The business in 30 seconds</p>
+  <p class="eyebrow">#N · The business in 30 seconds</p>
   <h2>Pay for what you use, down to the last recording</h2>
   <p>Customers send Hedgehog Metrics product data and pay monthly for what they use. Each product has a
   free allowance, then graduated tiers, and customers can cap their own monthly spend. Here is Tela's
   January session replay, {t["units"]:,} recordings, from free tier to invoice:</p>
   <div class="flow" role="list">{"".join(steps)}</div>
-  <p class="muted small">Each unit is priced at its own tier's rate, and tiers reset every month (SPEC 1, 3.5).
-  Usage above the limit is never billed and never revenue, because it was never owed (SPEC 3.4).</p>
+  <p class="muted small">Each unit is priced at its own tier's rate, and tiers reset every month.
+  Usage above the limit is never billed and never revenue, because it was never owed.</p>
+  <p class="callout">{inline(text["cap_line"])}</p>
   <h3 class="sub">Three customers, three lessons</h3>
   <div class="cards three">{cards}</div>
 </section>"""
@@ -284,14 +295,14 @@ def section_dollar(f):
         ("Usage at list", t["list"], "January usage priced at list, after the free tier.",
          no_entry("List price isn't the price Tela owes, so nothing posts yet.")),
         ("Billing limit", t["billing_limit"], "Tela's $1,000 monthly cap on session replay.",
-         no_entry("Never owed, so never revenue: not a reversal, a credit memo, or bad debt (SPEC 3.4).")),
+         no_entry("Never owed, so never revenue: not a reversal, a credit memo, or bad debt.")),
         ("Recognized in January", t["recognized"],
-         "January's usage is January's revenue, accrued as an unbilled receivable at month end (SPEC 3.1, 3.2).",
+         "January's usage is January's revenue, accrued as an unbilled receivable at month end.",
          entry_table(e["recognized"])),
         ("Invoiced", t["invoiced"], "The invoice goes out on business day 2 and moves the unbilled receivable "
          "to billed AR.", entry_table(e["invoiced"])),
         ("Price concession", t["concession"], "Tela disputed test-environment event volume. The credit memo is a "
-         "price concession, so it reduces February revenue, the period the price changed (SPEC 3.4).",
+         "price concession, so it reduces February revenue, the period the price changed.",
          entry_table(e["concession"])),
         ("Cash", t["cash"], "Tela pays the invoice less the credit memo, on time.", entry_table(e["cash"])),
     ]
@@ -301,7 +312,7 @@ def section_dollar(f):
         for name, amount, why, je in steps)
     return f"""
 <section id="dollar">
-  <p class="eyebrow">2 · Follow one dollar</p>
+  <p class="eyebrow">#N · Follow one dollar</p>
   <h2>Tela's January, from usage to cash</h2>
   <p>Six steps, each with the journal entry the model posted from the billing ledger. Two of them
   rightly post nothing.</p>
@@ -330,7 +341,7 @@ def section_charts(f):
                  for m in MONTHS]
     return f"""
 <section id="charts">
-  <p class="eyebrow">3 · Where the revenue came from</p>
+  <p class="eyebrow">#N · Where the revenue came from</p>
   <h2>Three customers, three ways to recognize revenue</h2>
   <div class="cards two">
     <figure class="card chart-card">
@@ -344,7 +355,7 @@ def section_charts(f):
       <figcaption><h3>Famous Mockingbird: credit vs contract liability</h3>
         <p class="muted small">Month-end balances. The liability is always the remaining credit
         × {f["credit_terms"]["per_dollar"]:.2f}, because the customer paid {money(f["credit_terms"]["per_dollar"])}
-        for each {money(f["credit_terms"]["dollar"])} of credit (SPEC 3.3).</p></figcaption>
+        for each {money(f["credit_terms"]["dollar"])} of credit.</p></figcaption>
       <div class="chart-box"><canvas id="mockChart" role="img"
         aria-label="Bar chart of credit balance at list and contract liability by month"></canvas></div>
       <details><summary>Show the numbers</summary>
@@ -376,7 +387,7 @@ def section_waterfall(f):
                 f'<div class="wf-amt">{money(c["schedule"])}</div></div>')
     return f"""
 <section id="reconciliation">
-  <p class="eyebrow">4 · Every dollar accounted for</p>
+  <p class="eyebrow">#N · Every dollar accounted for</p>
   <h2>January: from usage at list to revenue</h2>
   <p>Bridge C of the monthly reconciliation. Usage priced at list becomes recognized revenue only through
   named reconciling items, each tied to a policy in the spec.</p>
@@ -405,7 +416,7 @@ def section_judgment(sections):
                      f'<p class="position">{esc(position)}</p>{note}{more}</article>')
     return f"""
 <section id="judgment">
-  <p class="eyebrow">5 · Seven judgment calls</p>
+  <p class="eyebrow">#N · Seven judgment calls</p>
   <h2>The parts a spreadsheet can't decide</h2>
   <p>Where I landed on each open question, from my policy memo. Some positions go further than the
   model does; where they do, the card says so.</p>
@@ -426,7 +437,7 @@ def section_close(f):
         for name in f["controls"][MONTHS[0]])
     return f"""
 <section id="close">
-  <p class="eyebrow">6 · Close and controls</p>
+  <p class="eyebrow">#N · Close and controls</p>
   <h2>Closed on schedule, checked every month</h2>
   <p>Every close step has a preparer, a different reviewer, a due day, and an automated check. The model
   never signs off for the Controller, so each month stops one step short by design.</p>
@@ -452,12 +463,27 @@ def badge(passed):
 def section_built(text):
     return f"""
 <section id="built">
-  <p class="eyebrow">7 · How I built it</p>
+  <p class="eyebrow">#N · How I built it</p>
   <h2>Spec first, then code, one tested step at a time</h2>
   <p>{inline(text["how"])}</p>
   <p class="small"><a href="{REPO}/commits/main">Commit history →</a>
   &nbsp; <a href="{REPO}">The repository →</a></p>
 </section>"""
+
+
+def section_about():
+    return f"""
+<section id="about">
+  <p class="eyebrow">#N · About me</p>
+  <h2>Jonah Rice, CPA</h2>
+  <p>{esc(ABOUT)}</p>
+</section>"""
+
+
+def number_sections(body):
+    """Number the section eyebrows (#N) in page order, so reordering sections renumbers them."""
+    counter = iter(range(1, 100))
+    return re.sub(r"#N", lambda _: str(next(counter)), body)
 
 
 def chart_data(f):
@@ -471,9 +497,17 @@ def chart_data(f):
 
 
 def render(f, text, sections):
-    body = "".join([section_hero(f, text), "<main>", section_business(f, text), section_dollar(f),
-                    section_charts(f), section_waterfall(f), section_judgment(sections), section_close(f),
-                    section_built(text), "</main>"])
+    body = number_sections("".join([
+        section_hero(f, sections), "<main>",
+        section_business(f, text),    # 1
+        section_judgment(sections),   # 2
+        section_dollar(f),            # 3
+        section_waterfall(f),         # 4 every dollar accounted for
+        section_charts(f),            # 5 where the revenue came from
+        section_close(f),             # 6
+        section_built(text),          # 7
+        section_about(),              # 8
+        "</main>"]))
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -549,7 +583,8 @@ footer{border-top:1px solid var(--line);padding:32px 0 56px}
 .tile,.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
 .tile-value{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;line-height:1.15}
 .tile-label{color:var(--ink-2);margin-top:4px}
-.tile-note{font-size:.82rem;color:var(--muted);margin-top:10px}
+.tile-note{font-size:.85rem;color:var(--muted);margin-top:14px}
+.callout{font-size:1.1rem;font-style:italic;border-left:3px solid var(--accent);padding:4px 0 4px 14px;margin:20px 0}
 .flow{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 12px}
 .step{flex:1 1 120px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;
 position:relative}

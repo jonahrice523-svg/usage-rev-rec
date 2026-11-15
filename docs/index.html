@@ -41,7 +41,8 @@ footer{border-top:1px solid var(--line);padding:32px 0 56px}
 .tile,.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
 .tile-value{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;line-height:1.15}
 .tile-label{color:var(--ink-2);margin-top:4px}
-.tile-note{font-size:.82rem;color:var(--muted);margin-top:10px}
+.tile-note{font-size:.85rem;color:var(--muted);margin-top:14px}
+.callout{font-size:1.1rem;font-style:italic;border-left:3px solid var(--accent);padding:4px 0 4px 14px;margin:20px 0}
 .flow{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 12px}
 .step{flex:1 1 120px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;
 position:relative}
@@ -112,17 +113,17 @@ padding:8px 0;border-bottom:1px solid var(--line)}
 <header class="hero">
   <p class="eyebrow">Hedgehog Metrics, Inc. · Q1 2026 · synthetic data</p>
   <h1>Usage-based revenue, closed and reconciled.</h1>
-  <p class="lede">I built this to get hands-on with usage-based revenue accounting before interviewing for a revenue accounting role. Reading the guidance is one thing. Watching a $525 billing cap refuse to become revenue, and proving it with a test, is another.</p>
+  <p class="lede">A full quarter of usage-based revenue accounting for a fictional company, from raw usage to reconciled GL, built to show how I’d run revenue accounting at a usage-billed business. Built over one weekend, spec first, with Claude Code.</p>
   <div class="tiles">
-    <div class="tile"><div class="tile-value">$55,352.25</div>
-      <div class="tile-label">Q1 revenue, January–March 2026</div></div>
     <div class="tile"><div class="tile-value">$0.00</div>
       <div class="tile-label">unexplained difference in every reconciliation
         (12 bridges, 3 months)</div></div>
     <div class="tile"><div class="tile-value">8 of 8</div>
-      <div class="tile-label">controls pass, every month</div>
-      <div class="tile-note">Every number on this page is checked by the test suite.</div></div>
+      <div class="tile-label">controls pass, every month</div></div>
+    <div class="tile"><div class="tile-value">7</div>
+      <div class="tile-label">judgment calls documented</div></div>
   </div>
+  <p class="tile-note">Every number on this page is checked by the test suite.</p>
 </header><main>
 <section id="business">
   <p class="eyebrow">1 · The business in 30 seconds</p>
@@ -131,58 +132,14 @@ padding:8px 0;border-bottom:1px solid var(--line)}
   free allowance, then graduated tiers, and customers can cap their own monthly spend. Here is Tela's
   January session replay, 600,000 recordings, from free tier to invoice:</p>
   <div class="flow" role="list"><div class="step step-free"><div class="step-name">Free tier</div><div class="step-math">5,000 recordings</div><div class="step-amt">$0.00</div></div><div class="step"><div class="step-name">Tier 1</div><div class="step-math">45,000 × $0.005</div><div class="step-amt">$225.00</div></div><div class="step"><div class="step-name">Tier 2</div><div class="step-math">200,000 × $0.003</div><div class="step-amt">$600.00</div></div><div class="step"><div class="step-name">Tier 3</div><div class="step-math">350,000 × $0.002</div><div class="step-amt">$700.00</div></div><div class="step step-total"><div class="step-name">At list</div><div class="step-math">cheaper per unit as volume grows</div><div class="step-amt">$1,525.00</div></div><div class="step step-cap"><div class="step-name">Billing limit</div><div class="step-math">set by the customer</div><div class="step-amt">−$525.00</div></div><div class="step step-total"><div class="step-name">Billed and recognized</div><div class="step-math">the cap is part of the price</div><div class="step-amt">$1,000.00</div></div></div>
-  <p class="muted small">Each unit is priced at its own tier's rate, and tiers reset every month (SPEC 1, 3.5).
-  Usage above the limit is never billed and never revenue, because it was never owed (SPEC 3.4).</p>
+  <p class="muted small">Each unit is priced at its own tier's rate, and tiers reset every month.
+  Usage above the limit is never billed and never revenue, because it was never owed.</p>
+  <p class="callout">Reading the guidance is one thing. Watching a $525 billing cap refuse to become revenue, and proving it with a test, is another.</p>
   <h3 class="sub">Three customers, three lessons</h3>
   <div class="cards three"><div class="card customer"><h3>Harry Hood</h3><p class="plan">Monthly pay-as-you-go</p><p>Tiered pricing, month-end accrual and cutoff, lag estimate and true-up, duplicates, time zones.</p></div><div class="card customer"><h3>Famous Mockingbird</h3><p class="plan">$100,000 of annual credit for $80,000</p><p>Contract liability, revenue at $0.80 per $1.00 of credit, breakage constrained to zero.</p></div><div class="card customer"><h3>Tela</h3><p class="plan">Pay-as-you-go, Net 15, $1,000 replay limit</p><p>Billing limit, a billing question, a price concession, a late payment, AR aging.</p></div></div>
 </section>
-<section id="dollar">
-  <p class="eyebrow">2 · Follow one dollar</p>
-  <h2>Tela's January, from usage to cash</h2>
-  <p>Six steps, each with the journal entry the model posted from the billing ledger. Two of them
-  rightly post nothing.</p>
-  <ol class="dollar"><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Usage at list</span><span class="dollar-amt">$6,975.00</span></div><p>January usage priced at list, after the free tier.</p><div class="je je-none"><strong>No journal entry.</strong> List price isn't the price Tela owes, so nothing posts yet.</div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Billing limit</span><span class="dollar-amt">−$525.00</span></div><p>Tela's $1,000 monthly cap on session replay.</p><div class="je je-none"><strong>No journal entry.</strong> Never owed, so never revenue: not a reversal, a credit memo, or bad debt (SPEC 3.4).</div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Recognized in January</span><span class="dollar-amt">$6,450.00</span></div><p>January's usage is January's revenue, accrued as an unbilled receivable at month end (SPEC 3.1, 3.2).</p><div class="je"><div class="je-head"><span>JE-2026-01-31</span><span class="muted">2026-01-31</span></div><table><thead><tr><th>Account</th><th class="num">Dr</th><th class="num">Cr</th></tr></thead><tbody><tr><td>1150 Unbilled receivables</td><td class="num">$6,450.00</td><td class="num"></td></tr><tr><td>4000 Usage revenue <span class="muted">(event analytics)</span></td><td class="num"></td><td class="num">$4,300.00</td></tr><tr><td>4000 Usage revenue <span class="muted">(feature flags)</span></td><td class="num"></td><td class="num">$1,150.00</td></tr><tr><td>4000 Usage revenue <span class="muted">(session replay)</span></td><td class="num"></td><td class="num">$1,000.00</td></tr></tbody></table></div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Invoiced</span><span class="dollar-amt">$6,450.00</span></div><p>The invoice goes out on business day 2 and moves the unbilled receivable to billed AR.</p><div class="je"><div class="je-head"><span>JE-2026-02-03</span><span class="muted">2026-02-03</span></div><table><thead><tr><th>Account</th><th class="num">Dr</th><th class="num">Cr</th></tr></thead><tbody><tr><td>1100 Accounts receivable</td><td class="num">$6,450.00</td><td class="num"></td></tr><tr><td>1150 Unbilled receivables</td><td class="num"></td><td class="num">$6,450.00</td></tr></tbody></table></div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Price concession</span><span class="dollar-amt">−$1,500.00</span></div><p>Tela disputed test-environment event volume. The credit memo is a price concession, so it reduces February revenue, the period the price changed (SPEC 3.4).</p><div class="je"><div class="je-head"><span>JE-2026-02-10</span><span class="muted">2026-02-10</span></div><table><thead><tr><th>Account</th><th class="num">Dr</th><th class="num">Cr</th></tr></thead><tbody><tr><td>4900 Price concessions <span class="muted">(event analytics)</span></td><td class="num">$1,500.00</td><td class="num"></td></tr><tr><td>1100 Accounts receivable</td><td class="num"></td><td class="num">$1,500.00</td></tr></tbody></table></div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Cash</span><span class="dollar-amt">$4,950.00</span></div><p>Tela pays the invoice less the credit memo, on time.</p><div class="je"><div class="je-head"><span>JE-2026-02-17</span><span class="muted">2026-02-17</span></div><table><thead><tr><th>Account</th><th class="num">Dr</th><th class="num">Cr</th></tr></thead><tbody><tr><td>1000 Cash</td><td class="num">$4,950.00</td><td class="num"></td></tr><tr><td>1100 Accounts receivable</td><td class="num"></td><td class="num">$4,950.00</td></tr></tbody></table></div></li></ol>
-  <p class="small"><a href="https://github.com/jonahrice523-svg/usage-rev-rec/blob/main/output/workpapers/sample_tieouts.md">See this invoice traced
-  row by row in the sample tie-outs →</a></p>
-</section>
-<section id="charts">
-  <p class="eyebrow">3 · Where the revenue came from</p>
-  <h2>Three customers, three ways to recognize revenue</h2>
-  <div class="cards two">
-    <figure class="card chart-card">
-      <figcaption><h3>Revenue by month</h3>
-        <p class="muted small">Stacked by customer. February is net of Tela's concession.</p></figcaption>
-      <div class="chart-box"><canvas id="revenueChart" role="img"
-        aria-label="Stacked bar chart of revenue by month and customer"></canvas></div>
-      <details><summary>Show the numbers</summary><table class="data"><thead><tr><th></th><th class="num">January</th><th class="num">February</th><th class="num">March</th></tr></thead><tbody><tr><td>Harry Hood</td><td class="num">$3,257.25</td><td class="num">$3,265.00</td><td class="num">$3,275.00</td></tr><tr><td>Famous Mockingbird</td><td class="num">$9,220.00</td><td class="num">$12,020.00</td><td class="num">$10,540.00</td></tr><tr><td>Tela</td><td class="num">$6,450.00</td><td class="num">$3,200.00</td><td class="num">$4,125.00</td></tr><tr><td><strong>Total</strong></td><td class="num"><strong>$18,927.25</strong></td><td class="num"><strong>$18,485.00</strong></td><td class="num"><strong>$17,940.00</strong></td></tr></tbody></table></details>
-    </figure>
-    <figure class="card chart-card">
-      <figcaption><h3>Famous Mockingbird: credit vs contract liability</h3>
-        <p class="muted small">Month-end balances. The liability is always the remaining credit
-        × 0.80, because the customer paid $0.80
-        for each $1.00 of credit (SPEC 3.3).</p></figcaption>
-      <div class="chart-box"><canvas id="mockChart" role="img"
-        aria-label="Bar chart of credit balance at list and contract liability by month"></canvas></div>
-      <details><summary>Show the numbers</summary>
-        <table class="data"><thead><tr><th></th><th class="num">Credit at list</th><th class="num">Contract liability</th></tr></thead><tbody><tr><td>January</td><td class="num">$88,475.00</td><td class="num">$70,780.00</td></tr><tr><td>February</td><td class="num">$73,450.00</td><td class="num">$58,760.00</td></tr><tr><td>March</td><td class="num">$60,275.00</td><td class="num">$48,220.00</td></tr></tbody></table></details>
-    </figure>
-  </div>
-</section>
-<section id="reconciliation">
-  <p class="eyebrow">4 · Every dollar accounted for</p>
-  <h2>January: from usage at list to revenue</h2>
-  <p>Bridge C of the monthly reconciliation. Usage priced at list becomes recognized revenue only through
-  named reconciling items, each tied to a policy in the spec.</p>
-  <div class="card waterfall" role="img" aria-label="Waterfall from usage at list to recognized revenue">
-    <div class="wf-row"><div class="wf-label">Usage at list price, after the free tier</div><div class="wf-track"><div class="wf-bar wf-total" style="left:0.000%;width:100.000%"></div></div><div class="wf-amt">$21,725.00</div></div><div class="wf-row"><div class="wf-label">Capped by the billing limit, never revenue</div><div class="wf-track"><div class="wf-bar wf-down" style="left:97.583%;width:2.417%"></div></div><div class="wf-amt">−$525.00</div></div><div class="wf-row"><div class="wf-label">Credit discount: drawdown at list less revenue at 0.80</div><div class="wf-track"><div class="wf-bar wf-down" style="left:86.974%;width:10.610%"></div></div><div class="wf-amt">−$2,305.00</div></div><div class="wf-row"><div class="wf-label">Lag estimate at month end</div><div class="wf-track"><div class="wf-bar wf-up" style="left:86.974%;width:0.400%"></div></div><div class="wf-amt">+$32.25</div></div><div class="wf-row wf-result"><div class="wf-label">Revenue per the revenue schedule</div><div class="wf-track"><div class="wf-bar wf-total" style="left:0%;width:87.122%"></div></div><div class="wf-amt">$18,927.25</div></div>
-    <p class="muted small">Also in the bridge, at $0.00 this month: reversal of last month&#x27;s lag estimate, late usage rated this month: lag true-up or unusual item, price concession, contra-revenue.</p>
-  </div>
-  <p class="unexplained">Unexplained difference: <strong>$0.00</strong></p>
-  <p class="small"><a href="https://github.com/jonahrice523-svg/usage-rev-rec/blob/main/output/reconciliation.md">All four bridges, all three months,
-  in reconciliation.md →</a></p>
-</section>
 <section id="judgment">
-  <p class="eyebrow">5 · Seven judgment calls</p>
+  <p class="eyebrow">2 · Seven judgment calls</p>
   <h2>The parts a spreadsheet can't decide</h2>
   <p>Where I landed on each open question, from my policy memo. Some positions go further than the
   model does; where they do, the card says so.</p>
@@ -197,7 +154,7 @@ padding:8px 0;border-bottom:1px solid var(--line)}
 <p><strong>Why.</strong> HM's service is what happens to customer data once it arrives. HM ingests it (accepts it, validates it, and drops duplicates), processes it (ties it to the right user and session), stores it, and makes it usable in dashboards, reports, and session replays. All of that, and the computing and storage cost behind it, happens after receipt, so HM performs when the data arrives. The device timestamp records the customer's own activity, and it's set by a clock HM doesn't control. Receipt time is HM's own record, which makes it reliable and auditable. It also removes most "late usage" questions entirely. A customer importing a year of historical data in February is simply February usage: their activity happened over the year, but our service happened in February.</p>
 <p><strong>HM's own delays are different.</strong> If HM received data in January but its pipeline didn't process it until after the close, that's still January usage. If January is still open, it goes into January. If January is closed, it's recorded in the current month as a change in estimate, unless it's material. In the model, the lag batch (received January 31, processed February 6) is covered by the 1% estimate and trued up by $7.75 in February.</p>
 <p><strong>The contract has to match.</strong> Billing terms should define billable usage the same way ("events received during each calendar month, UTC"), so the invoice and revenue never follow different clocks.</p>
-<p><strong>What I'd plan for up front.</strong> At User Interviews we were still in the planning phase when I left, so we never ran a usage close. If I were planning it again, I'd settle three things before go-live: the timestamp that defines billable usage, written into the customer terms; a cutoff day for each close; and a monthly report of usage received but not processed by that cutoff.</p></details></article><article class="card judgment"><p class="num-badge">4</p><h3>Setting the lag rate and the close threshold</h3><p class="position">Estimate the routine processing lag every month; send unusual items over the threshold to a person, checked against both the month they belong to and the month they’re booked.</p><p class="model-note">In the model: unusual items are tested against the current month&#x27;s revenue only (SPEC 3.2). Checking both months is the policy I&#x27;d adopt.</p><details><summary>Read the reasoning</summary><p><strong>Lag rate.</strong> Usage processing is automated. A pipeline ingests events, removes duplicates, matches them to customers, totals them, and prices them. That pipeline has a small, routine lag: queues back up at month end, scheduled jobs only run so often, and failed jobs retry. So some usage HM received in a month isn't priced by the cutoff on business day 3. Because the lag comes from the same system every month, it's measurable, so I estimate it rather than hold the close open. I'd set the rate from the trailing three to six months of the lag report (usage received but not processed by the cutoff), leave outages and other one-off incidents out, and refresh it quarterly. In the model the rate is 1%, or $32.25 for Harry Hood each month. The actual was $40 (1.24%) for January and $0 for February.</p>
+<p><strong>What I'd plan for up front.</strong> At User Interviews we were still in the planning phase when I left, so we never ran a usage close. If I were planning it again, I'd settle three things before go-live: the timestamp that defines billable usage, written into the customer terms; a cutoff day for each close; and a monthly report of usage received but not processed by that cutoff.</p></details></article><article class="card judgment"><p class="num-badge">4</p><h3>Setting the lag rate and the close threshold</h3><p class="position">Estimate the routine processing lag every month; send unusual items over the threshold to a person, checked against both the month they belong to and the month they’re booked.</p><p class="model-note">In the model: unusual items are tested against the current month&#x27;s revenue only. Checking both months is the policy I&#x27;d adopt.</p><details><summary>Read the reasoning</summary><p><strong>Lag rate.</strong> Usage processing is automated. A pipeline ingests events, removes duplicates, matches them to customers, totals them, and prices them. That pipeline has a small, routine lag: queues back up at month end, scheduled jobs only run so often, and failed jobs retry. So some usage HM received in a month isn't priced by the cutoff on business day 3. Because the lag comes from the same system every month, it's measurable, so I estimate it rather than hold the close open. I'd set the rate from the trailing three to six months of the lag report (usage received but not processed by the cutoff), leave outages and other one-off incidents out, and refresh it quarterly. In the model the rate is 1%, or $32.25 for Harry Hood each month. The actual was $40 (1.24%) for January and $0 for February.</p>
 <p><strong>Close threshold.</strong> Unusual items the estimate doesn't anticipate, like a bug fix that reprocesses a closed month, are measured across all customers for the month combined, so twenty small items can't each slip under the line. Below the threshold, they're recorded in the current month and logged with a running total. Above it, they aren't automatically a prior-period error. They go to a person to evaluate under ASC 250, and the outcome could still be a current-month adjustment. I'd agree the threshold with the auditors during planning and set it below their "clearly trivial" amount, so what we pass never adds up to something they'd want booked.</p>
 <p><strong>Which month to measure against.</strong> The model compares unusual items to 0.5% of the current month's revenue. The stronger policy, and the one I'd adopt, checks both the month the item belongs to and the month it's booked in, and uses the stricter result. March's $50 bug fix passes both easily: it's 0.26% of January's revenue and 0.28% of March's.</p>
 <p><strong>Size isn't the only test.</strong> An item under the threshold still gets escalated if it would change a number the board watches, such as monthly revenue growth, or if it points to a control failure that could happen again.</p></details></article><article class="card judgment"><p class="num-badge">5</p><h3>When concessions become a practice</h3><p class="position">One concession is an event; a pattern is an estimate, and repeated causes are also a product question.</p><details><summary>Read the reasoning</summary><p><strong>Position.</strong> One concession is an event; a pattern is an estimate. Tela's $1,500 credit was the only one in the quarter (23% of Tela's January invoice, 2.7% of Q1 revenue). So it was recorded in February as a price concession, reducing revenue in the period the price changed (RR 4.3.3.1, RR 5.5.2), and wasn't reserved for in advance.</p>
@@ -217,6 +174,51 @@ padding:8px 0;border-bottom:1px solid var(--line)}
 <p><strong>How the model catches it.</strong> Every ledger row is either mapped or lands in exceptions, each GL account total ties to the ledger, and rerunning the export produces identical output.</p>
 <p><strong>From experience.</strong> At User Interviews we posted summary entries from Chargebee into QuickBooks to recognize revenue, and they generally tied. When they didn't, manual entries were almost always the cause, which is why I'd rather limit who can post manually than rely on catching it in the reconciliation. Part of our revenue was transactional, pay-as-you-go, and we ran an accrued revenue workflow for it, recognizing revenue as projects and sessions were completed. Delays in processing those completions sometimes surfaced as out-of-period adjustments. That's the same problem this model's lag estimate and close threshold are built to handle.</p></details></article></div>
   <p class="small"><a href="https://github.com/jonahrice523-svg/usage-rev-rec/blob/main/MEMO.md">Read the full memo, MEMO.md →</a></p>
+</section>
+<section id="dollar">
+  <p class="eyebrow">3 · Follow one dollar</p>
+  <h2>Tela's January, from usage to cash</h2>
+  <p>Six steps, each with the journal entry the model posted from the billing ledger. Two of them
+  rightly post nothing.</p>
+  <ol class="dollar"><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Usage at list</span><span class="dollar-amt">$6,975.00</span></div><p>January usage priced at list, after the free tier.</p><div class="je je-none"><strong>No journal entry.</strong> List price isn't the price Tela owes, so nothing posts yet.</div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Billing limit</span><span class="dollar-amt">−$525.00</span></div><p>Tela's $1,000 monthly cap on session replay.</p><div class="je je-none"><strong>No journal entry.</strong> Never owed, so never revenue: not a reversal, a credit memo, or bad debt.</div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Recognized in January</span><span class="dollar-amt">$6,450.00</span></div><p>January's usage is January's revenue, accrued as an unbilled receivable at month end.</p><div class="je"><div class="je-head"><span>JE-2026-01-31</span><span class="muted">2026-01-31</span></div><table><thead><tr><th>Account</th><th class="num">Dr</th><th class="num">Cr</th></tr></thead><tbody><tr><td>1150 Unbilled receivables</td><td class="num">$6,450.00</td><td class="num"></td></tr><tr><td>4000 Usage revenue <span class="muted">(event analytics)</span></td><td class="num"></td><td class="num">$4,300.00</td></tr><tr><td>4000 Usage revenue <span class="muted">(feature flags)</span></td><td class="num"></td><td class="num">$1,150.00</td></tr><tr><td>4000 Usage revenue <span class="muted">(session replay)</span></td><td class="num"></td><td class="num">$1,000.00</td></tr></tbody></table></div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Invoiced</span><span class="dollar-amt">$6,450.00</span></div><p>The invoice goes out on business day 2 and moves the unbilled receivable to billed AR.</p><div class="je"><div class="je-head"><span>JE-2026-02-03</span><span class="muted">2026-02-03</span></div><table><thead><tr><th>Account</th><th class="num">Dr</th><th class="num">Cr</th></tr></thead><tbody><tr><td>1100 Accounts receivable</td><td class="num">$6,450.00</td><td class="num"></td></tr><tr><td>1150 Unbilled receivables</td><td class="num"></td><td class="num">$6,450.00</td></tr></tbody></table></div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Price concession</span><span class="dollar-amt">−$1,500.00</span></div><p>Tela disputed test-environment event volume. The credit memo is a price concession, so it reduces February revenue, the period the price changed.</p><div class="je"><div class="je-head"><span>JE-2026-02-10</span><span class="muted">2026-02-10</span></div><table><thead><tr><th>Account</th><th class="num">Dr</th><th class="num">Cr</th></tr></thead><tbody><tr><td>4900 Price concessions <span class="muted">(event analytics)</span></td><td class="num">$1,500.00</td><td class="num"></td></tr><tr><td>1100 Accounts receivable</td><td class="num"></td><td class="num">$1,500.00</td></tr></tbody></table></div></li><li class="dollar-step"><div class="dollar-head"><span class="dollar-name">Cash</span><span class="dollar-amt">$4,950.00</span></div><p>Tela pays the invoice less the credit memo, on time.</p><div class="je"><div class="je-head"><span>JE-2026-02-17</span><span class="muted">2026-02-17</span></div><table><thead><tr><th>Account</th><th class="num">Dr</th><th class="num">Cr</th></tr></thead><tbody><tr><td>1000 Cash</td><td class="num">$4,950.00</td><td class="num"></td></tr><tr><td>1100 Accounts receivable</td><td class="num"></td><td class="num">$4,950.00</td></tr></tbody></table></div></li></ol>
+  <p class="small"><a href="https://github.com/jonahrice523-svg/usage-rev-rec/blob/main/output/workpapers/sample_tieouts.md">See this invoice traced
+  row by row in the sample tie-outs →</a></p>
+</section>
+<section id="reconciliation">
+  <p class="eyebrow">4 · Every dollar accounted for</p>
+  <h2>January: from usage at list to revenue</h2>
+  <p>Bridge C of the monthly reconciliation. Usage priced at list becomes recognized revenue only through
+  named reconciling items, each tied to a policy in the spec.</p>
+  <div class="card waterfall" role="img" aria-label="Waterfall from usage at list to recognized revenue">
+    <div class="wf-row"><div class="wf-label">Usage at list price, after the free tier</div><div class="wf-track"><div class="wf-bar wf-total" style="left:0.000%;width:100.000%"></div></div><div class="wf-amt">$21,725.00</div></div><div class="wf-row"><div class="wf-label">Capped by the billing limit, never revenue</div><div class="wf-track"><div class="wf-bar wf-down" style="left:97.583%;width:2.417%"></div></div><div class="wf-amt">−$525.00</div></div><div class="wf-row"><div class="wf-label">Credit discount: drawdown at list less revenue at 0.80</div><div class="wf-track"><div class="wf-bar wf-down" style="left:86.974%;width:10.610%"></div></div><div class="wf-amt">−$2,305.00</div></div><div class="wf-row"><div class="wf-label">Lag estimate at month end</div><div class="wf-track"><div class="wf-bar wf-up" style="left:86.974%;width:0.400%"></div></div><div class="wf-amt">+$32.25</div></div><div class="wf-row wf-result"><div class="wf-label">Revenue per the revenue schedule</div><div class="wf-track"><div class="wf-bar wf-total" style="left:0%;width:87.122%"></div></div><div class="wf-amt">$18,927.25</div></div>
+    <p class="muted small">Also in the bridge, at $0.00 this month: reversal of last month&#x27;s lag estimate, late usage rated this month: lag true-up or unusual item, price concession, contra-revenue.</p>
+  </div>
+  <p class="unexplained">Unexplained difference: <strong>$0.00</strong></p>
+  <p class="small"><a href="https://github.com/jonahrice523-svg/usage-rev-rec/blob/main/output/reconciliation.md">All four bridges, all three months,
+  in reconciliation.md →</a></p>
+</section>
+<section id="charts">
+  <p class="eyebrow">5 · Where the revenue came from</p>
+  <h2>Three customers, three ways to recognize revenue</h2>
+  <div class="cards two">
+    <figure class="card chart-card">
+      <figcaption><h3>Revenue by month</h3>
+        <p class="muted small">Stacked by customer. February is net of Tela's concession.</p></figcaption>
+      <div class="chart-box"><canvas id="revenueChart" role="img"
+        aria-label="Stacked bar chart of revenue by month and customer"></canvas></div>
+      <details><summary>Show the numbers</summary><table class="data"><thead><tr><th></th><th class="num">January</th><th class="num">February</th><th class="num">March</th></tr></thead><tbody><tr><td>Harry Hood</td><td class="num">$3,257.25</td><td class="num">$3,265.00</td><td class="num">$3,275.00</td></tr><tr><td>Famous Mockingbird</td><td class="num">$9,220.00</td><td class="num">$12,020.00</td><td class="num">$10,540.00</td></tr><tr><td>Tela</td><td class="num">$6,450.00</td><td class="num">$3,200.00</td><td class="num">$4,125.00</td></tr><tr><td><strong>Total</strong></td><td class="num"><strong>$18,927.25</strong></td><td class="num"><strong>$18,485.00</strong></td><td class="num"><strong>$17,940.00</strong></td></tr></tbody></table></details>
+    </figure>
+    <figure class="card chart-card">
+      <figcaption><h3>Famous Mockingbird: credit vs contract liability</h3>
+        <p class="muted small">Month-end balances. The liability is always the remaining credit
+        × 0.80, because the customer paid $0.80
+        for each $1.00 of credit.</p></figcaption>
+      <div class="chart-box"><canvas id="mockChart" role="img"
+        aria-label="Bar chart of credit balance at list and contract liability by month"></canvas></div>
+      <details><summary>Show the numbers</summary>
+        <table class="data"><thead><tr><th></th><th class="num">Credit at list</th><th class="num">Contract liability</th></tr></thead><tbody><tr><td>January</td><td class="num">$88,475.00</td><td class="num">$70,780.00</td></tr><tr><td>February</td><td class="num">$73,450.00</td><td class="num">$58,760.00</td></tr><tr><td>March</td><td class="num">$60,275.00</td><td class="num">$48,220.00</td></tr></tbody></table></details>
+    </figure>
+  </div>
 </section>
 <section id="close">
   <p class="eyebrow">6 · Close and controls</p>
@@ -242,6 +244,11 @@ padding:8px 0;border-bottom:1px solid var(--line)}
   <p>I set the scope, the accounting policies, and the expected results, and reviewed and approved every step. Claude helped draft the spec, and Claude Code wrote the code one step at a time, with tests. The commit history shows the process. <a href="https://github.com/jonahrice523-svg/usage-rev-rec/blob/main/MEMO.md">MEMO.md</a> is my own writing.</p>
   <p class="small"><a href="https://github.com/jonahrice523-svg/usage-rev-rec/commits/main">Commit history →</a>
   &nbsp; <a href="https://github.com/jonahrice523-svg/usage-rev-rec">The repository →</a></p>
+</section>
+<section id="about">
+  <p class="eyebrow">8 · About me</p>
+  <h2>Jonah Rice, CPA</h2>
+  <p>Previously acting controller at a $16M ARR SaaS company, where I ran an accrued-revenue workflow for pay-as-you-go revenue, posted revenue from Chargebee into QuickBooks, and was the main contact for our auditors. Started at PwC in audit.</p>
 </section></main>
 <footer>
   <p><strong>Jonah Rice, CPA</strong></p>
