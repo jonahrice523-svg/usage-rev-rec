@@ -1,7 +1,8 @@
-"""Run the quarter's revenue close end to end.
+"""Run the quarter's revenue close end to end: `python run.py` (SPEC 8, step 10).
 
-`close_quarter()` runs every built step in SPEC section 8 order and writes the outputs.
-`main()` then prints a short summary of each step. Each later step adds its piece here.
+`close_quarter()` runs every step in SPEC section 8 order and writes data/ and output/.
+`main()` then prints a short summary of each step. The fixed random seed means every run
+produces identical files.
 """
 
 from pathlib import Path
@@ -20,7 +21,7 @@ from revrec.rollforwards import MONTHS, closing, run_rollforwards
 from revrec.usage import load_usage
 
 ROOT = Path(__file__).parent
-DATA, CONFIG, OUTPUT = ROOT / "data", ROOT / "config", ROOT / "output"
+CONFIG = ROOT / "config"
 FOLDERS = ["data", "config", "output", "output/workpapers"]
 
 # SPEC 8: build order
@@ -36,14 +37,20 @@ BUILD_STEPS = [
     "9. Workpapers and the Tela billing reply",
     "10. run.py runs the whole quarter's close",
 ]
-STEPS_DONE = 9
+STEPS_DONE = 10
 
 
-def close_quarter():
-    """Run steps 2-9 and return everything each step produced."""
+def close_quarter(root=ROOT, config=CONFIG):
+    """Run steps 2-9 and return everything each step produced.
+
+    root is the folder that gets data/ and output/ (the repo by default; tests pass a
+    temporary folder). config is the hand-kept chart of accounts and account mapping.
+    """
+    root = Path(root)
+    DATA, CONFIG, OUTPUT = root / "data", Path(config), root / "output"
     for folder in FOLDERS:
-        (ROOT / folder).mkdir(parents=True, exist_ok=True)
-    r = {}
+        (root / folder).mkdir(parents=True, exist_ok=True)
+    r = {"root": root}
     generate(DATA)                                                                     # step 2
     inputs = load_inputs(DATA)
     r["inputs"] = inputs
