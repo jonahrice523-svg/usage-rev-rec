@@ -24,11 +24,12 @@ A small, end-to-end model of one quarter of revenue accounting for a fictional u
 
 - Tiers are **graduated** (each unit is priced at its own tier's rate) and **reset every calendar month**.
 - Customers may set a **billing limit**: a dollar cap per product per month. Each month, the price is the lower of what the usage costs (after the free tier and tier pricing) or the cap. Usage above the cap is never billed.
-- Monthly invoices are issued on business day 2 for the prior month's usage, with Net 30 terms.
+- Monthly invoices are issued on business day 2 for the prior month's usage, with Net 30 terms unless a customer's terms say otherwise (Tela is Net 15).
+- Business days are weekdays, with no holidays in the model period. Business day 2 is February 3 and March 3. Business day 3, the close cutoff, is February 4 and March 4.
 
 ### Annual prepaid credit
 - Credit is sold at a **20% discount**: $100,000 of credit costs $80,000. It's invoiced upfront, Net 30, and noncancellable, with a 12-month term.
-- Usage draws down credit at standard list prices on any product.
+- Usage draws down credit at standard list prices on any product, after the same monthly free tier every customer gets.
 - Unused credit expires at term end.
 
 **Model period:** January–March 2026 (three monthly closes). The fiscal year starts January 1.
@@ -41,7 +42,7 @@ A small, end-to-end model of one quarter of revenue accounting for a fictional u
 |---|---|---|
 | **Harry Hood** | Monthly, pay-as-you-go. Pays on time. | Core usage-based recognition: tiered pricing, month-end accrual and cutoff, lag estimate and true-up, customer-side delays, duplicate usage |
 | **Famous Mockingbird** | Annual prepaid credit: $100,000 of credit for $80,000, term Jan 1 – Dec 31, 2026 | Deferrals and recognition schedules: contract liability, drawdown at the discounted rate, breakage judgment, liability rollforward |
-| **Tela** | Monthly, pay-as-you-go, with a billing limit on session replay | AR and collections: a billing question about the cap, a disputed January invoice partially credited in February, a late February payment, and AR aging and follow-up |
+| **Tela** | Monthly, pay-as-you-go, Net 15, with a $1,000 monthly billing limit on session replay | AR and collections: a billing question about the cap, a disputed January invoice partially credited in February, a late February payment, and AR aging and follow-up |
 
 ---
 
@@ -94,8 +95,8 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
 
 ### 3.4 Billing limits, disputes, and collections (Tela)
 - **Billing limit:** Tela has set a dollar cap on session replay. Usage above the cap is not billed and not recognized, because HM has no right to consideration for it. In effect, the cap is part of the price.
-  - *Example:* With a $10,000 cap and $15,000 of replay usage at list price, Tela is invoiced $10,000 and HM recognizes $10,000 of revenue. The $5,000 is never owed.
-  - **The cap is applied before revenue is calculated.** The $5,000 is not revenue followed by a reversal or contra-revenue, not a credit memo or concession, and not bad debt, because it was never owed.
+  - *In the model:* Tela's cap is $1,000 a month. January replay usage prices at $1,525, so Tela is invoiced $1,000 and HM recognizes $1,000 of revenue. The $525 is never owed.
+  - **The cap is applied before revenue is calculated.** The $525 is not revenue followed by a reversal or contra-revenue, not a credit memo or concession, and not bad debt, because it was never owed.
   - **Reconciliation:** Capped usage is reported separately as a reconciling item, so the usage-to-invoice tie-out shows the gap rather than an unexplained difference.
   - *In practice*, products with billing limits often stop processing data once the cap is hit. The model lets the usage arrive and prices it so the cap is visible.
 - **The billing question:** In early February, Tela's finance team asks why January's invoice is higher than December's. The answer comes from the model's per-customer usage-to-invoice trace. The repo includes the reply as `output/billing_reply_tela.md`, written in plain language for a customer.
@@ -104,10 +105,11 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
   - **Timing:** January's service is already delivered, so the change in transaction price reduces revenue in **February**, the period the price changes (ASC 606-10-32-43; RR 5.5.2). It's recorded as contra-revenue.
   - **Policy question for the memo:** A reporting entity that expects to give concessions, or has a practice of doing so, should reduce the transaction price up front (RR 4.3.3.1; **Example RR 4-9**). At what point does HM's history become a "practice"?
 - **Collections:**
-  - Tela short-pays January (invoice less the credit memo) on time.
-  - Tela pays the February invoice **20 days late**. It appears in the 1–30 days past due bucket of the March 31 AR aging, then clears in April, outside the model period.
+  - Tela is on **Net 15** terms.
+  - The January invoice (issued February 3, due February 18) is credited on February 10. Tela short-pays it (invoice less the credit memo) on February 17, on time.
+  - The February invoice (issued March 3, due March 18) is paid **20 days late**, on April 7. It's 13 days past due at March 31, so it appears in the 1–30 days past due bucket of the March 31 AR aging. It clears in April, outside the model period.
   - Collectibility isn't in doubt, and lateness alone doesn't change revenue. The memo notes what would trigger a reassessment.
-  - The model generates an AR aging and a short collections log: reminder sent at day 5 past due, follow-up at day 15.
+  - The model generates an AR aging and a short collections log: reminder sent at day 5 past due (March 23), follow-up at day 15 (April 2, after the period, shown as scheduled).
 
 ### 3.5 Free tier
 - Usage within the free tier generates no consideration and therefore no revenue. Free usage is still counted in the reconciliation so completeness can be proven.
@@ -138,15 +140,53 @@ The GL export is ERP-agnostic. No real ERP's import format is assumed.
 | `contracts.csv` | contract | `contract_id`, `customer_id`, `contract_type` (payg / credit), `effective_from`, `effective_to`, `credit_value`, `cash_price` |
 | `rate_cards.csv` | product × tier | `product`, `tier_floor`, `tier_ceiling`, `unit_price` |
 | `usage_events.csv` | daily aggregate per customer per product | `event_id`, `customer_id`, `product`, `quantity`, `client_ts`, `received_ts`, `processed_ts` |
-| `payments.csv` | payment | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
+| `payments.csv` | payment, **generated in build step 4** from rules once invoices exist (Harry Hood pays in full before the due date; Famous Mockingbird pays January 28; Tela as in 3.4). Invoice IDs follow a fixed pattern, e.g. `INV-2026-01-TELA`. | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
+| `prior_period_invoices.csv` | Tela's December 2025 invoice by product. Reference only, for the billing reply in 3.4; never recognized as revenue. | `customer_id`, `invoice_id`, `product`, `amount` |
 | `adjustments.csv` | credit memo | `adjustment_id`, `customer_id`, `invoice_id`, `amount`, `date`, `reason`, `classification` |
 | `assumptions.csv` | assumption | `key`, `value`, `note` (close cutoff day, historical lag rate, close threshold as % of the month's revenue, breakage %, collections reminder days) |
 
 Keep the data small enough to inspect by eye: daily aggregates, with a few deliberate problem rows for Harry Hood:
 - two duplicate rows
-- one batch received January 31 but processed February 2, after the cutoff (HM-side lag: January revenue via the estimate, true-up in February)
+- one batch of 2,000,000 events received January 31 but processed February 6, after the cutoff (business day 3 is February 4). This is HM-side lag: January revenue via the estimate, true-up in February.
 - one batch with a January 31 `client_ts` received February 1 (customer-side delay: February usage, no true-up)
 - one event at 11pm Pacific on January 31, which is February 1 in UTC (time zone: February usage)
+- one unusual item: in March, a bug fix reprocesses $200 of Harry Hood's January usage. It's below the close threshold, so it's recorded in March and logged in `passed_adjustments_log.csv` (section 3.2). It must not change any expected result below.
+
+### Check scenarios: fixed inputs and expected results
+
+The generator can randomize how usage is spread across days, but each customer's monthly totals below are fixed, so the results can be checked by hand. The tests assert every expected result.
+
+**Monthly usage totals (received in the month and processed by the cutoff):**
+
+| Customer | Month | Events | Recordings | Flag requests |
+|---|---|---|---|---|
+| Harry Hood | Jan | 30,000,000 | 300,000 | 20,000,000 |
+| Famous Mockingbird | Jan | 300,000,000 | 1,000,000 | 50,000,000 |
+| Famous Mockingbird | Feb | 400,000,000 | 1,500,000 | 60,000,000 |
+| Famous Mockingbird | Mar | 350,000,000 | 1,200,000 | 55,000,000 |
+| Tela | Jan | 200,000,000 | 600,000 | 15,000,000 |
+| Tela | Feb | 120,000,000 | 400,000 | 12,000,000 |
+
+**Also:**
+- Harry Hood's lag batch: 2,000,000 events received January 31, processed February 6.
+- Tela's session replay cap: $1,000 a month.
+- Historical lag rate: 1%.
+- Close threshold: 0.5% of the month's total revenue, measured in aggregate.
+- The free tier applies to every customer, including Famous Mockingbird, before usage is priced.
+
+**Expected results:**
+
+| # | Check | Expected |
+|---|---|---|
+| 1 | Harry Hood January usage at close (events $900 + replay $925 + flags $1,400) | $3,225.00 |
+| 1a | Lag estimate accrued January 31 (1% × $3,225) | $32.25 |
+| 1b | True-up line on the February invoice (2M events at January's tier 3 rate), and the change in estimate recognized in February ($40.00 − $32.25) | $40.00 and $7.75 |
+| 2 | Famous Mockingbird credit consumed in Q1 at list price ($11,525 + $15,025 + $13,175) | $39,725.00 |
+| 2a | Famous Mockingbird Q1 revenue (× 0.80) | $31,780.00 |
+| 2b | Contract liability at March 31 ($80,000 − $31,780, which also equals $60,275 of remaining credit × 0.80) | $48,220.00 |
+| 3 | Tela January invoice (events $4,300 + replay capped at $1,000 + flags $1,150; $525 capped) | $6,450.00 |
+| 3a | Tela February revenue (usage $4,700, with $125 capped, less the $1,500 concession) | $3,200.00 |
+| 3b | Tela January cash received (invoice less the credit memo) | $4,950.00 |
 
 ---
 
@@ -217,7 +257,7 @@ Keep the data small enough to inspect by eye: daily aggregates, with a few delib
 - Each rollforward ties to the GL.
 - The reconciliation has zero unexplained difference in each month.
 - All close checklist checks pass.
-- One hand-calculated number per customer matches the model. Jonah calculates these in a spreadsheet first.
+- The model matches every expected result in the check scenarios (section 5), which Jonah has recomputed independently in a spreadsheet.
 
 ---
 
