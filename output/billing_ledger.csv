@@ -24,7 +24,7 @@ BL-00022,2026-02-01,lag_estimate_reversal,revenue_engine,HOOD,,,2026-01,,32.25,,
 BL-00023,2026-02-03,invoice_issued,billing,HOOD,INV-2026-01-HOOD,,2026-01,,3225.00,,,"Invoice issued, due 2026-03-05"
 BL-00024,2026-02-03,invoice_issued,billing,TELA,INV-2026-01-TELA,,2026-01,,6450.00,,,"Invoice issued, due 2026-02-18"
 BL-00025,2026-02-06,late_usage_rated,billing,HOOD,INV-2026-02-HOOD,event_analytics,2026-01,2000000,40.00,40.00,EVT-000281,"January usage, processed after the close cutoff"
-BL-00026,2026-02-10,credit_memo,billing,TELA,INV-2026-01-TELA,,,,1500.00,,ADJ-2026-02-001,price_concession: January event volume included a misconfigured test environment
+BL-00026,2026-02-10,credit_memo,billing,TELA,INV-2026-01-TELA,event_analytics,,,1500.00,,ADJ-2026-02-001,price_concession: January event volume included a misconfigured test environment
 BL-00027,2026-02-17,payment_applied,billing,TELA,INV-2026-01-TELA,,,,4950.00,,PAY-0004,Payment received
 BL-00028,2026-02-28,usage_rated,billing,HOOD,,event_analytics,2026-02,30000000,900.00,900.00,,Usage rated at close
 BL-00029,2026-02-28,usage_rated,billing,HOOD,,feature_flags,2026-02,20000000,1400.00,1400.00,,Usage rated at close

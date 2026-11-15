@@ -1,0 +1,12 @@
+event_type,classification,posts,debit_account,credit_account,note
+opening_balance,,yes,1150,3000,SPEC 5: December usage unbilled at Jan 1; 2025 revenue already closed to retained earnings
+usage_rated,,yes,1150,4000,SPEC 3.1 and 3.2: usage recognized at month end as unbilled receivable
+late_usage_rated,,yes,1150,4000,SPEC 3.2: late usage recognized when rated (lag true-up or unusual item)
+lag_estimate,,yes,1150,4010,SPEC 3.2: lag estimate at close
+lag_estimate_reversal,,yes,4010,1150,SPEC 3.2: estimate reverses on the 1st of the next month
+invoice_issued,,yes,1100,1150,SPEC 3.2: unbilled receivable moves to billed AR when invoiced
+credit_invoice_issued,,yes,1100,2400,SPEC 3.3: prepaid credit invoiced upfront; contract liability
+credit_drawdown,,no,,,SPEC 3.3: memo only; credit balance at list value is tracked outside the GL
+credit_revenue_recognized,,yes,2400,4100,SPEC 3.3: revenue at 0.80 per 1.00 of credit consumed
+credit_memo,price_concession,yes,4900,1100,SPEC 3.4: price concession; contra-revenue in the period of change
+payment_applied,,yes,1000,1100,Cash received against an invoice

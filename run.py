@@ -10,6 +10,7 @@ from pathlib import Path
 from revrec.billing import ar_balances, invoice_totals, run_billing
 from revrec.generate_data import generate
 from revrec.pricing import load_billing_limits, load_rate_card, price_monthly_usage
+from revrec.gl import account_balances, run_gl
 from revrec.revenue import revenue_by, run_revenue
 from revrec.usage import load_usage, summarize
 
@@ -29,7 +30,26 @@ BUILD_STEPS = [
     "9. Workpapers and the Tela billing reply",
     "10. run.py runs the whole quarter's close",
 ]
-STEPS_DONE = 5
+STEPS_DONE = 6
+
+
+def print_gl_summary(config, data, output, ledger):
+    """Step 6: GL export through the account mapping, trial balance, and integration controls."""
+    gl, mapped, controls, chart = run_gl(config, data, output, ledger)
+    names = chart.set_index("account")["name"].to_dict()
+    print("Trial balance at March 31 (from output/gl_export.csv):")
+    print(f"  {'Account':<38}{'Debit':>14}{'Credit':>14}")
+    balances = account_balances(gl)
+    for account in sorted(balances):
+        value = balances[account]
+        debit, credit = (f"{value:,.2f}", "") if value > 0 else ("", f"{-value:,.2f}")
+        print(f"  {account + ' ' + names[account]:<38}{debit:>14}{credit:>14}")
+    debits = sum(v for v in balances.values() if v > 0)
+    print(f"  {'Total':<38}{debits:>14,.2f}{debits:>14,.2f}")
+    print("Integration controls:")
+    for name, passed, detail in controls:
+        print(f"  {'PASS' if passed else 'FAIL'}  {name} ({detail})")
+    print()
 
 
 def print_revenue_summary(data, output, billing_ledger):
@@ -48,6 +68,7 @@ def print_revenue_summary(data, output, billing_ledger):
     print(f"Unbilled AR at March 31 including the lag estimate: {sum(unbilled.values()):,.2f}")
     print(f"Billing ledger now has {len(ledger)} events; unusual-item exceptions: {len(exceptions)}")
     print()
+    return ledger
 
 
 def print_billing_summary(data, output):
@@ -100,7 +121,8 @@ def main():
 
     print_pricing_summary(ROOT / "data")  # step 3
     billing_ledger = print_billing_summary(ROOT / "data", ROOT / "output")  # step 4
-    print_revenue_summary(ROOT / "data", ROOT / "output", billing_ledger)  # step 5
+    ledger = print_revenue_summary(ROOT / "data", ROOT / "output", billing_ledger)  # step 5
+    print_gl_summary(ROOT / "config", ROOT / "data", ROOT / "output", ledger)  # step 6
 
     print("Build progress (SPEC section 8):")
     for number, step in enumerate(BUILD_STEPS, start=1):

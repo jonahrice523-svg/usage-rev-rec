@@ -189,6 +189,7 @@ def test_adjustment_and_prior_period_invoice(data_dir):
     assert (memo.customer_id, memo.invoice_id, memo.date) == ("TELA", "INV-2026-01-TELA", "2026-02-10")
     assert Decimal(memo.amount) == Decimal("1500.00")
     assert memo.classification == "price_concession"  # SPEC 3.4
+    assert memo["product"] == "event_analytics"  # SPEC 3.4: the dispute concerned event volume
 
     december = read(data_dir, "prior_period_invoices.csv")
     tela = sum(Decimal(a) for a in december[december.customer_id == "TELA"].amount)
@@ -197,10 +198,10 @@ def test_adjustment_and_prior_period_invoice(data_dir):
 
 
 def test_opening_balances(data_dir):
-    # SPEC 5: unbilled AR for December usage at January 1, offset to opening equity; nothing else.
+    # SPEC 5: unbilled AR for December usage at January 1, offset to retained earnings; nothing else.
     opening = read(data_dir, "opening_balances.csv")
     assert set(opening.as_of) == {"2026-01-01"}
-    assert set(opening.account) == {"unbilled_ar", "opening_balance_equity"}
+    assert set(opening.account) == {"unbilled_ar", "retained_earnings"}
     assert sum(Decimal(d) for d in opening.debit) == sum(Decimal(c) for c in opening.credit)
 
     unbilled = opening[opening.account == "unbilled_ar"].set_index("customer_id")

@@ -1,0 +1,10 @@
+account,name,type
+1000,Cash,asset
+1100,Accounts receivable,asset
+1150,Unbilled receivables,asset
+2400,Contract liability,liability
+3000,Retained earnings,equity
+4000,Usage revenue,revenue
+4010,Usage revenue - lag estimate,revenue
+4100,Prepaid credit revenue,revenue
+4900,Price concessions,contra_revenue

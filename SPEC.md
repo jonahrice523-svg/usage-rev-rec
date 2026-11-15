@@ -130,7 +130,13 @@ The posting mentions owning the integration between a billing ledger and the acc
   - Events after March 31 (the March invoices issued April 2, Tela's April 7 payment) are kept at their real dates. Every Q1 report and rollforward cuts off at March 31.
   - It also carries the revenue engine's entries (lag estimates and reversals, and credit revenue at 0.80), marked `origin = revenue_engine`, so the GL still comes only from the ledger. Billing events are marked `origin = billing`.
 - **Account mapping** (`config/account_mapping.csv`): maps each billing ledger event type to GL debits and credits. This file is where finance owns the integration logic.
+  - Accounts are in `config/chart_of_accounts.csv`: 1000 Cash, 1100 Accounts receivable, 1150 Unbilled receivables, 2400 Contract liability, 3000 Retained earnings, 4000 Usage revenue, 4010 Usage revenue – lag estimate, 4100 Prepaid credit revenue, 4900 Price concessions (contra-revenue).
+  - Postings use the ledger's `amount` only, never `list_amount`.
+  - Credit drawdown at list value is mapped as memo-only: the credit balance is tracked outside the GL, and the GL moves at cash value through credit revenue (section 3.3).
+  - Credit memos are mapped by classification. Only `price_concession` is mapped; any other classification is an exception for a person to classify.
 - **GL export** (`output/gl_export.csv`): journal entries generated only from the billing ledger through the mapping, summarized by day, account, and customer, with a `ledger_id` trail back to the source rows.
+  - One journal entry per day (`JE-YYYY-MM-DD`). It covers January 1 – March 31; later ledger rows are reported as after period end, not exported.
+  - Lines on revenue and contra-revenue accounts (4000, 4010, 4100, 4900) also carry `product`, so revenue by product can be produced from the GL to support the ASC 606 disaggregation disclosure.
 - **Integration controls:**
   - Every billing ledger row is either mapped or appears in exceptions.
   - The GL export's total for each account ties to the billing ledger.
@@ -151,7 +157,7 @@ The GL export is ERP-agnostic. No real ERP's import format is assumed.
 | `payments.csv` | payment, **generated in build step 4** from rules once invoices exist (Harry Hood pays in full 3 days before the due date, or the weekday before if that falls on a weekend; Famous Mockingbird pays January 28; Tela as in 3.4, and pays its December invoice by the same 3-day rule; invoices issued after March 31 have no payments). Invoice IDs follow a fixed pattern, e.g. `INV-2026-01-TELA`. | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
 | `prior_period_invoices.csv` | December 2025 invoices for Harry Hood and Tela, by product. They're issued January 2 from the opening unbilled AR. Tela's also supports the billing reply in 3.4. December usage is never recognized as revenue in the model period. | `customer_id`, `invoice_id`, `product`, `amount` |
 | `opening_balances.csv` | balance at January 1, 2026 | `as_of`, `account`, `customer_id`, `debit`, `credit`, `note` |
-| `adjustments.csv` | credit memo | `adjustment_id`, `customer_id`, `invoice_id`, `amount`, `date`, `reason`, `classification` |
+| `adjustments.csv` | credit memo | `adjustment_id`, `customer_id`, `invoice_id`, `product`, `amount`, `date`, `reason`, `classification` |
 | `assumptions.csv` | assumption | `key`, `value`, `note` (close cutoff day, historical lag rate, close threshold as % of the month's revenue, breakage %, collections reminder days) |
 
 Keep the data small enough to inspect by eye: daily aggregates, with a few deliberate problem rows for Harry Hood:
@@ -164,7 +170,7 @@ Keep the data small enough to inspect by eye: daily aggregates, with a few delib
 ### Opening balances (January 1, 2026)
 
 Harry Hood and Tela had contracts in 2025, so both have December usage that was unbilled at January 1:
-- Unbilled AR: Harry Hood $3,100.00 and Tela $3,800.00. Each is offset to an opening balance equity account. Each equals that customer's December invoice in `prior_period_invoices.csv`.
+- Unbilled AR: Harry Hood $3,100.00 and Tela $3,800.00. Each is offset to retained earnings, because December's usage was 2025 revenue already closed to retained earnings. Each equals that customer's December invoice in `prior_period_invoices.csv`.
 - Both December invoices are issued January 2 (business day 2) and paid on time in January.
 - There are no other opening balances: no billed AR, no contract liability (Famous Mockingbird's contract starts January 1), and no lag estimate.
 - Every rollforward in section 6 starts from these balances.
@@ -219,6 +225,24 @@ Harry Hood's February totals include the customer-side delay batch and the time-
 | 5b | Unbilled AR at March 31 including Harry Hood's $32.25 March lag estimate | $7,432.25 |
 | 6 | Total revenue by month: January (Harry Hood $3,257.25 + Famous Mockingbird $9,220 + Tela $6,450) and February (Harry Hood $3,265 + Famous Mockingbird $12,020 + Tela $3,200). March is check 4. | $18,927.25 and $18,485.00 |
 | 6a | Q1 total revenue ($18,927.25 + $18,485.00 + $17,940.00) | $55,352.25 |
+| 7 | Trial balance at March 31, from the GL export (see below). Cash is receipts through March 31: $3,800 + $80,000 + $3,100 + $4,950 + $3,225 + $3,265. | $111,972.25 each side; cash $98,340.00 |
+
+**Check 7: trial balance at March 31**
+
+| Account | Debit | Credit |
+|---|---|---|
+| 1000 Cash | 98,340.00 | |
+| 1100 Accounts receivable | 4,700.00 | |
+| 1150 Unbilled receivables | 7,432.25 | |
+| 2400 Contract liability | | 48,220.00 |
+| 3000 Retained earnings | | 6,900.00 |
+| 4000 Usage revenue | | 25,040.00 |
+| 4010 Usage revenue – lag estimate | | 32.25 |
+| 4100 Prepaid credit revenue | | 31,780.00 |
+| 4900 Price concessions | 1,500.00 | |
+| **Total** | **111,972.25** | **111,972.25** |
+
+Net revenue (4000 + 4010 + 4100 − 4900) is $55,352.25, which equals check 6a.
 
 ---
 

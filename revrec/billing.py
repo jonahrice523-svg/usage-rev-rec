@@ -233,7 +233,7 @@ def build_ledger(inputs, lines, payments):
 
     # SPEC 3.4: credit memos.
     for row in inputs.adjustments.itertuples():
-        add(row.date, "credit_memo", row.customer_id, row.amount, invoice_id=row.invoice_id,
+        add(row.date, "credit_memo", row.customer_id, row.amount, invoice_id=row.invoice_id, product=row.product,
             source_ref=row.adjustment_id, description=f"{row.classification}: {row.reason}")
 
     for row in payments.itertuples():

@@ -144,8 +144,8 @@ def build_revenue_schedule(ledger, inputs, assumptions):
         elif row.event_type == "credit_revenue_recognized":
             add(row, "credit_drawdown", amount, "3.3")
         elif row.event_type == "credit_memo" and concessions.loc[row.source_ref, "classification"] == "price_concession":
-            # SPEC 3.4: contra-revenue in the period the price changes; the dispute was about event volume.
-            add(row, "concession", -amount, "3.4", product="event_analytics", note=row.source_ref)
+            # SPEC 3.4: contra-revenue in the period the price changes, on the product in adjustments.csv.
+            add(row, "concession", -amount, "3.4", note=row.source_ref)
 
     schedule = pd.DataFrame(rows)
 

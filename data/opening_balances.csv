@@ -1,5 +1,5 @@
 as_of,account,customer_id,debit,credit,note
 2026-01-01,unbilled_ar,HOOD,3100.00,0.00,"December 2025 usage, invoiced January 2"
-2026-01-01,opening_balance_equity,HOOD,0.00,3100.00,Offset to opening unbilled AR
+2026-01-01,retained_earnings,HOOD,0.00,3100.00,2025 revenue closed to retained earnings
 2026-01-01,unbilled_ar,TELA,3800.00,0.00,"December 2025 usage, invoiced January 2"
-2026-01-01,opening_balance_equity,TELA,0.00,3800.00,Offset to opening unbilled AR
+2026-01-01,retained_earnings,TELA,0.00,3800.00,2025 revenue closed to retained earnings

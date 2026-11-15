@@ -1,2 +1,2 @@
-adjustment_id,customer_id,invoice_id,amount,date,reason,classification
-ADJ-2026-02-001,TELA,INV-2026-01-TELA,1500.00,2026-02-10,January event volume included a misconfigured test environment,price_concession
+adjustment_id,customer_id,invoice_id,product,amount,date,reason,classification
+ADJ-2026-02-001,TELA,INV-2026-01-TELA,event_analytics,1500.00,2026-02-10,January event volume included a misconfigured test environment,price_concession

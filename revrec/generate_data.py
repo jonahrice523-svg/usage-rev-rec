@@ -162,10 +162,11 @@ def generate(data_dir):
                "processed_ts", "source"],
               build_usage_rows(rng))
 
-    # SPEC 3.4: $1,500 credit memo on Feb 10 against Tela's January invoice; a price concession.
+    # SPEC 3.4: $1,500 credit memo on Feb 10 against Tela's January invoice; a price concession
+    # on event analytics, the product the dispute concerned.
     write_csv(data_dir / "adjustments.csv",
-              ["adjustment_id", "customer_id", "invoice_id", "amount", "date", "reason", "classification"],
-              [["ADJ-2026-02-001", TELA, "INV-2026-01-TELA", "1500.00", "2026-02-10",
+              ["adjustment_id", "customer_id", "invoice_id", "product", "amount", "date", "reason", "classification"],
+              [["ADJ-2026-02-001", TELA, "INV-2026-01-TELA", EVENTS, "1500.00", "2026-02-10",
                 "January event volume included a misconfigured test environment", "price_concession"]])
 
     # SPEC 5: December 2025 invoices, issued January 2 from the opening unbilled AR.
@@ -179,14 +180,14 @@ def generate(data_dir):
                [TELA, "INV-2025-12-TELA", REPLAY, "900.00"],
                [TELA, "INV-2025-12-TELA", FLAGS, "800.00"]])
 
-    # SPEC 5: opening balances at January 1, 2026. Unbilled AR for December usage,
-    # offset to opening balance equity. No other opening balances.
+    # SPEC 5: opening balances at January 1, 2026. Unbilled AR for December usage, offset to
+    # retained earnings: December usage was 2025 revenue, already closed. No other opening balances.
     write_csv(data_dir / "opening_balances.csv",
               ["as_of", "account", "customer_id", "debit", "credit", "note"],
               [["2026-01-01", "unbilled_ar", HOOD, "3100.00", "0.00", "December 2025 usage, invoiced January 2"],
-               ["2026-01-01", "opening_balance_equity", HOOD, "0.00", "3100.00", "Offset to opening unbilled AR"],
+               ["2026-01-01", "retained_earnings", HOOD, "0.00", "3100.00", "2025 revenue closed to retained earnings"],
                ["2026-01-01", "unbilled_ar", TELA, "3800.00", "0.00", "December 2025 usage, invoiced January 2"],
-               ["2026-01-01", "opening_balance_equity", TELA, "0.00", "3800.00", "Offset to opening unbilled AR"]])
+               ["2026-01-01", "retained_earnings", TELA, "0.00", "3800.00", "2025 revenue closed to retained earnings"]])
 
     write_csv(data_dir / "assumptions.csv",
               ["key", "value", "note"],
