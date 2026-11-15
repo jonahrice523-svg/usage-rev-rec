@@ -132,7 +132,7 @@ def test_5_spec_5_expected_results(quarter):
 
 def test_the_close_is_reproducible(quarter, tmp_path):
     again = run.close_quarter(tmp_path)
-    for folder, count in [("data", 9), ("output", 15)]:  # 9 inputs; 13 outputs + 2 workpapers
+    for folder, count in [("data", 9), ("output", 15), ("docs", 1)]:  # 9 inputs; 13 outputs + 2 workpapers; the page
         first, second = quarter["root"] / folder, again["root"] / folder
         files = sorted(p.relative_to(first) for p in first.rglob("*") if p.is_file())
         assert len(files) == count, folder

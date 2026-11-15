@@ -18,6 +18,7 @@ from revrec.pricing import price_monthly_usage
 from revrec.reconciliation import run_reconciliation
 from revrec.revenue import load_assumptions, revenue_by, run_revenue
 from revrec.rollforwards import MONTHS, closing, run_rollforwards
+from revrec.site import run_site
 from revrec.usage import load_usage
 
 ROOT = Path(__file__).parent
@@ -36,8 +37,10 @@ BUILD_STEPS = [
     "8. Reconciliation, close checklist, exceptions",
     "9. Workpapers and the Tela billing reply",
     "10. run.py runs the whole quarter's close",
+    "11. MEMO.md, the policy memo (written by Jonah)",
+    "12. docs/index.html, the case study page",
 ]
-STEPS_DONE = 10
+STEPS_DONE = 12
 
 
 def close_quarter(root=ROOT, config=CONFIG):
@@ -78,6 +81,8 @@ def close_quarter(root=ROOT, config=CONFIG):
         raw_usage=load_usage(DATA / "usage_events.csv"), usage_summary=inputs.usage, ledger=r["ledger"],
         lines=r["lines"], invoices=r["invoices"], gl=r["gl"], mapping=read_text_csv(CONFIG / "account_mapping.csv"),
         adjustments=inputs.adjustments, cutoff_day=inputs.cutoff_business_day)
+    # step 12: the case study page, from these results plus README.md and MEMO.md (SPEC 6, item 11)
+    r["site"] = run_site(r, root / "docs", readme_path=ROOT / "README.md", memo_path=ROOT / "MEMO.md")
     return r
 
 
@@ -184,13 +189,20 @@ def print_workpapers(r):
     print()
 
 
+def print_site(r):
+    facts = r["site"]["facts"]
+    print(f"Step 12. Case study page (docs/index.html): Q1 revenue {facts['q1_revenue']:,.2f}, "
+          f"{len(r['site']['sections'])} judgment calls from MEMO.md")
+    print()
+
+
 def main():
     print("Hedgehog Metrics, Inc. - usage revenue model (synthetic data)")
     print("Model period: January-March 2026")  # SPEC 1
     print()
     r = close_quarter()
     for section in [print_pricing, print_billing, print_revenue, print_gl, print_rollforwards, print_close,
-                    print_workpapers]:
+                    print_workpapers, print_site]:
         section(r)
     print("Build progress (SPEC section 8):")
     for number, step in enumerate(BUILD_STEPS, start=1):
