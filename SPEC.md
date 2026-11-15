@@ -99,6 +99,7 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
   - *In the model:* Tela's cap is $1,000 a month. January replay usage prices at $1,525, so Tela is invoiced $1,000 and HM recognizes $1,000 of revenue. The $525 is never owed.
   - **The cap is applied before revenue is calculated.** The $525 is not revenue followed by a reversal or contra-revenue, not a credit memo or concession, and not bad debt, because it was never owed.
   - **Reconciliation:** Capped usage is reported separately as a reconciling item, so the usage-to-invoice tie-out shows the gap rather than an unexplained difference.
+  - **On the invoice:** replay tier lines are shown at list, followed by a separate "Monthly billing limit ($1,000.00)" line for the capped amount. This line is presentation only. It never posts to revenue, contra-revenue, or a credit memo.
   - *In practice*, products with billing limits often stop processing data once the cap is hit. The model lets the usage arrive and prices it so the cap is visible.
 - **The billing question:** In early February, Tela's finance team asks why January's invoice is higher than December's. The answer comes from the model's per-customer usage-to-invoice trace. The repo includes the reply as `output/billing_reply_tela.md`, written in plain language for a customer.
 - **The dispute:** Tela says some January event volume came from a misconfigured test environment and asks for relief. HM issues a **$1,500 credit memo** in February.
@@ -122,6 +123,8 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
 The posting mentions owning the integration between a billing ledger and the accounting ERP. The model mirrors that pattern generically:
 
 - **Billing ledger** (`output/billing_ledger.csv`): the system of record for every billing event, including usage rated, invoice issued, credit drawn down, credit memo, and payment applied. One row per event, with an immutable `ledger_id`.
+  - It also carries the January 1 opening unbilled AR (section 5), so rollforwards and the GL start from the ledger.
+  - Events after March 31 (the March invoices issued April 2, Tela's April 7 payment) are kept at their real dates. Every Q1 report and rollforward cuts off at March 31.
 - **Account mapping** (`config/account_mapping.csv`): maps each billing ledger event type to GL debits and credits. This file is where finance owns the integration logic.
 - **GL export** (`output/gl_export.csv`): journal entries generated only from the billing ledger through the mapping, summarized by day, account, and customer, with a `ledger_id` trail back to the source rows.
 - **Integration controls:**
@@ -141,7 +144,7 @@ The GL export is ERP-agnostic. No real ERP's import format is assumed.
 | `contracts.csv` | contract | `contract_id`, `customer_id`, `contract_type` (payg / credit), `effective_from`, `effective_to`, `credit_value`, `cash_price` |
 | `rate_cards.csv` | product × tier | `product`, `tier_floor`, `tier_ceiling`, `unit_price` |
 | `usage_events.csv` | daily aggregate per customer per product | `event_id`, `customer_id`, `product`, `quantity`, `client_ts`, `received_ts`, `processed_ts`, `source` (`normal` / `bug_fix_reprocess`) |
-| `payments.csv` | payment, **generated in build step 4** from rules once invoices exist (Harry Hood pays in full before the due date; Famous Mockingbird pays January 28; Tela as in 3.4; Harry Hood and Tela pay their December invoices on time in January). Invoice IDs follow a fixed pattern, e.g. `INV-2026-01-TELA`. | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
+| `payments.csv` | payment, **generated in build step 4** from rules once invoices exist (Harry Hood pays in full 3 days before the due date, or the weekday before if that falls on a weekend; Famous Mockingbird pays January 28; Tela as in 3.4, and pays its December invoice by the same 3-day rule; invoices issued after March 31 have no payments). Invoice IDs follow a fixed pattern, e.g. `INV-2026-01-TELA`. | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
 | `prior_period_invoices.csv` | December 2025 invoices for Harry Hood and Tela, by product. They're issued January 2 from the opening unbilled AR. Tela's also supports the billing reply in 3.4. December usage is never recognized as revenue in the model period. | `customer_id`, `invoice_id`, `product`, `amount` |
 | `opening_balances.csv` | balance at January 1, 2026 | `as_of`, `account`, `customer_id`, `debit`, `credit`, `note` |
 | `adjustments.csv` | credit memo | `adjustment_id`, `customer_id`, `invoice_id`, `amount`, `date`, `reason`, `classification` |
@@ -207,6 +210,8 @@ Harry Hood's February totals include the customer-side delay batch and the time-
 | 3b | Tela January cash received (invoice less the credit memo) | $4,950.00 |
 | 3c | Tela March revenue (events $2,300 + replay $925, under the cap + flags $900) | $4,125.00 |
 | 4 | March total revenue (Famous Mockingbird $10,540 + Harry Hood $3,275 + Tela $4,125); 0.5% close threshold; the $50 bug fix falls below it | $17,940.00 and $89.70 |
+| 5 | Billed AR at March 31 (Tela's February invoice only, 13 days past due) | $4,700.00 |
+| 5a | Unbilled AR at March 31 from usage (Harry Hood $3,275 including the $50 bug fix + Tela $4,125; March usage is invoiced April 2). Step 5 adds Harry Hood's $32.25 March lag estimate, for $7,432.25. | $7,400.00 |
 
 ---
 

@@ -1,11 +1,13 @@
 """Run the quarter's revenue close end to end.
 
-So far this generates the synthetic input data (step 2). Each later step
-in SPEC.md section 8 adds its piece here.
+So far: synthetic data (step 2), pricing (step 3), invoices, payments,
+and the billing ledger (step 4). Each later step in SPEC.md section 8
+adds its piece here.
 """
 
 from pathlib import Path
 
+from revrec.billing import ar_balances, invoice_totals, run_billing
 from revrec.generate_data import generate
 from revrec.pricing import load_billing_limits, load_rate_card, price_monthly_usage
 from revrec.usage import load_usage, summarize
@@ -26,7 +28,20 @@ BUILD_STEPS = [
     "9. Workpapers and the Tela billing reply",
     "10. run.py runs the whole quarter's close",
 ]
-STEPS_DONE = 3
+STEPS_DONE = 4
+
+
+def print_billing_summary(data, output):
+    """Step 4: invoices, payments, and the billing ledger."""
+    lines, payments, ledger = run_billing(data, output)
+    print("Invoices (output/invoices.csv):")
+    for inv in invoice_totals(lines).sort_values(["issue_date", "invoice_id"]).itertuples():
+        print(f"  {inv.invoice_id:<18} issued {inv.issue_date}  due {inv.due_date}  {inv.total:>12,.2f}")
+    print(f"Payments written to data/payments.csv: {len(payments)}")
+    print(f"Billing ledger (output/billing_ledger.csv): {len(ledger)} events")
+    billed, unbilled = ar_balances(ledger, "2026-03-31")
+    print(f"AR at March 31: billed {sum(billed.values()):,.2f}, unbilled {sum(unbilled.values()):,.2f}")
+    print()
 
 
 def print_pricing_summary(data):
@@ -64,6 +79,7 @@ def main():
     print()
 
     print_pricing_summary(ROOT / "data")  # step 3
+    print_billing_summary(ROOT / "data", ROOT / "output")  # step 4
 
     print("Build progress (SPEC section 8):")
     for number, step in enumerate(BUILD_STEPS, start=1):
