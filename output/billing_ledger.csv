@@ -1,49 +1,64 @@
-ledger_id,event_date,event_type,customer_id,invoice_id,product,usage_month,quantity,amount,list_amount,source_ref,description
-BL-00001,2026-01-01,opening_balance,HOOD,,,2025-12,,3100.00,,opening_balances.csv,"December 2025 usage, invoiced January 2"
-BL-00002,2026-01-01,opening_balance,TELA,,,2025-12,,3800.00,,opening_balances.csv,"December 2025 usage, invoiced January 2"
-BL-00003,2026-01-01,credit_invoice_issued,MOCK,INV-2026-01-MOCK,,,,80000.00,,,"Invoice issued, due 2026-01-31"
-BL-00004,2026-01-02,invoice_issued,HOOD,INV-2025-12-HOOD,,2025-12,,3100.00,,,"Invoice issued, due 2026-02-01"
-BL-00005,2026-01-02,invoice_issued,TELA,INV-2025-12-TELA,,2025-12,,3800.00,,,"Invoice issued, due 2026-01-17"
-BL-00006,2026-01-14,payment_applied,TELA,INV-2025-12-TELA,,,,3800.00,,PAY-0001,Payment received
-BL-00007,2026-01-28,payment_applied,MOCK,INV-2026-01-MOCK,,,,80000.00,,PAY-0002,Payment received
-BL-00008,2026-01-29,payment_applied,HOOD,INV-2025-12-HOOD,,,,3100.00,,PAY-0003,Payment received
-BL-00009,2026-01-31,usage_rated,HOOD,,event_analytics,2026-01,30000000,900.00,900.00,,Usage rated at close
-BL-00010,2026-01-31,usage_rated,HOOD,,feature_flags,2026-01,20000000,1400.00,1400.00,,Usage rated at close
-BL-00011,2026-01-31,usage_rated,HOOD,,session_replay,2026-01,300000,925.00,925.00,,Usage rated at close
-BL-00012,2026-01-31,usage_rated,TELA,,event_analytics,2026-01,200000000,4300.00,4300.00,,Usage rated at close
-BL-00013,2026-01-31,usage_rated,TELA,,feature_flags,2026-01,15000000,1150.00,1150.00,,Usage rated at close
-BL-00014,2026-01-31,usage_rated,TELA,,session_replay,2026-01,600000,1000.00,1525.00,,Usage rated at close
-BL-00015,2026-01-31,credit_drawdown,MOCK,,event_analytics,2026-01,300000000,6300.00,6300.00,,Credit drawn down at list price
-BL-00016,2026-01-31,credit_drawdown,MOCK,,feature_flags,2026-01,50000000,2900.00,2900.00,,Credit drawn down at list price
-BL-00017,2026-01-31,credit_drawdown,MOCK,,session_replay,2026-01,1000000,2325.00,2325.00,,Credit drawn down at list price
-BL-00018,2026-02-03,invoice_issued,HOOD,INV-2026-01-HOOD,,2026-01,,3225.00,,,"Invoice issued, due 2026-03-05"
-BL-00019,2026-02-03,invoice_issued,TELA,INV-2026-01-TELA,,2026-01,,6450.00,,,"Invoice issued, due 2026-02-18"
-BL-00020,2026-02-06,late_usage_rated,HOOD,INV-2026-02-HOOD,event_analytics,2026-01,2000000,40.00,40.00,EVT-000281,"January usage, processed after the close cutoff"
-BL-00021,2026-02-10,credit_memo,TELA,INV-2026-01-TELA,,,,1500.00,,ADJ-2026-02-001,price_concession: January event volume included a misconfigured test environment
-BL-00022,2026-02-17,payment_applied,TELA,INV-2026-01-TELA,,,,4950.00,,PAY-0004,Payment received
-BL-00023,2026-02-28,usage_rated,HOOD,,event_analytics,2026-02,30000000,900.00,900.00,,Usage rated at close
-BL-00024,2026-02-28,usage_rated,HOOD,,feature_flags,2026-02,20000000,1400.00,1400.00,,Usage rated at close
-BL-00025,2026-02-28,usage_rated,HOOD,,session_replay,2026-02,300000,925.00,925.00,,Usage rated at close
-BL-00026,2026-02-28,usage_rated,TELA,,event_analytics,2026-02,120000000,2700.00,2700.00,,Usage rated at close
-BL-00027,2026-02-28,usage_rated,TELA,,feature_flags,2026-02,12000000,1000.00,1000.00,,Usage rated at close
-BL-00028,2026-02-28,usage_rated,TELA,,session_replay,2026-02,400000,1000.00,1125.00,,Usage rated at close
-BL-00029,2026-02-28,credit_drawdown,MOCK,,event_analytics,2026-02,400000000,8300.00,8300.00,,Credit drawn down at list price
-BL-00030,2026-02-28,credit_drawdown,MOCK,,feature_flags,2026-02,60000000,3400.00,3400.00,,Credit drawn down at list price
-BL-00031,2026-02-28,credit_drawdown,MOCK,,session_replay,2026-02,1500000,3325.00,3325.00,,Credit drawn down at list price
-BL-00032,2026-03-02,payment_applied,HOOD,INV-2026-01-HOOD,,,,3225.00,,PAY-0005,Payment received
-BL-00033,2026-03-03,invoice_issued,HOOD,INV-2026-02-HOOD,,2026-02,,3265.00,,,"Invoice issued, due 2026-04-02"
-BL-00034,2026-03-03,invoice_issued,TELA,INV-2026-02-TELA,,2026-02,,4700.00,,,"Invoice issued, due 2026-03-18"
-BL-00035,2026-03-10,late_usage_rated,HOOD,INV-2026-03-HOOD,event_analytics,2026-01,2500000,50.00,50.00,EVT-000178,"January usage, reprocessed after a system fix"
-BL-00036,2026-03-30,payment_applied,HOOD,INV-2026-02-HOOD,,,,3265.00,,PAY-0006,Payment received
-BL-00037,2026-03-31,usage_rated,HOOD,,event_analytics,2026-03,30000000,900.00,900.00,,Usage rated at close
-BL-00038,2026-03-31,usage_rated,HOOD,,feature_flags,2026-03,20000000,1400.00,1400.00,,Usage rated at close
-BL-00039,2026-03-31,usage_rated,HOOD,,session_replay,2026-03,300000,925.00,925.00,,Usage rated at close
-BL-00040,2026-03-31,usage_rated,TELA,,event_analytics,2026-03,100000000,2300.00,2300.00,,Usage rated at close
-BL-00041,2026-03-31,usage_rated,TELA,,feature_flags,2026-03,10000000,900.00,900.00,,Usage rated at close
-BL-00042,2026-03-31,usage_rated,TELA,,session_replay,2026-03,300000,925.00,925.00,,Usage rated at close
-BL-00043,2026-03-31,credit_drawdown,MOCK,,event_analytics,2026-03,350000000,7300.00,7300.00,,Credit drawn down at list price
-BL-00044,2026-03-31,credit_drawdown,MOCK,,feature_flags,2026-03,55000000,3150.00,3150.00,,Credit drawn down at list price
-BL-00045,2026-03-31,credit_drawdown,MOCK,,session_replay,2026-03,1200000,2725.00,2725.00,,Credit drawn down at list price
-BL-00046,2026-04-02,invoice_issued,HOOD,INV-2026-03-HOOD,,2026-03,,3275.00,,,"Invoice issued, due 2026-05-02"
-BL-00047,2026-04-02,invoice_issued,TELA,INV-2026-03-TELA,,2026-03,,4125.00,,,"Invoice issued, due 2026-04-17"
-BL-00048,2026-04-07,payment_applied,TELA,INV-2026-02-TELA,,,,4700.00,,PAY-0007,Payment received
+ledger_id,event_date,event_type,origin,customer_id,invoice_id,product,usage_month,quantity,amount,list_amount,source_ref,description
+BL-00001,2026-01-01,opening_balance,billing,HOOD,,,2025-12,,3100.00,,opening_balances.csv,"December 2025 usage, invoiced January 2"
+BL-00002,2026-01-01,opening_balance,billing,TELA,,,2025-12,,3800.00,,opening_balances.csv,"December 2025 usage, invoiced January 2"
+BL-00003,2026-01-01,credit_invoice_issued,billing,MOCK,INV-2026-01-MOCK,,,,80000.00,,,"Invoice issued, due 2026-01-31"
+BL-00004,2026-01-02,invoice_issued,billing,HOOD,INV-2025-12-HOOD,,2025-12,,3100.00,,,"Invoice issued, due 2026-02-01"
+BL-00005,2026-01-02,invoice_issued,billing,TELA,INV-2025-12-TELA,,2025-12,,3800.00,,,"Invoice issued, due 2026-01-17"
+BL-00006,2026-01-14,payment_applied,billing,TELA,INV-2025-12-TELA,,,,3800.00,,PAY-0001,Payment received
+BL-00007,2026-01-28,payment_applied,billing,MOCK,INV-2026-01-MOCK,,,,80000.00,,PAY-0002,Payment received
+BL-00008,2026-01-29,payment_applied,billing,HOOD,INV-2025-12-HOOD,,,,3100.00,,PAY-0003,Payment received
+BL-00009,2026-01-31,usage_rated,billing,HOOD,,event_analytics,2026-01,30000000,900.00,900.00,,Usage rated at close
+BL-00010,2026-01-31,usage_rated,billing,HOOD,,feature_flags,2026-01,20000000,1400.00,1400.00,,Usage rated at close
+BL-00011,2026-01-31,usage_rated,billing,HOOD,,session_replay,2026-01,300000,925.00,925.00,,Usage rated at close
+BL-00012,2026-01-31,usage_rated,billing,TELA,,event_analytics,2026-01,200000000,4300.00,4300.00,,Usage rated at close
+BL-00013,2026-01-31,usage_rated,billing,TELA,,feature_flags,2026-01,15000000,1150.00,1150.00,,Usage rated at close
+BL-00014,2026-01-31,usage_rated,billing,TELA,,session_replay,2026-01,600000,1000.00,1525.00,,Usage rated at close
+BL-00015,2026-01-31,lag_estimate,revenue_engine,HOOD,,,2026-01,,32.25,,,Lag estimate: 1.00% of 2026-01 processed usage revenue
+BL-00016,2026-01-31,credit_drawdown,billing,MOCK,,event_analytics,2026-01,300000000,6300.00,6300.00,,Credit drawn down at list price
+BL-00017,2026-01-31,credit_drawdown,billing,MOCK,,feature_flags,2026-01,50000000,2900.00,2900.00,,Credit drawn down at list price
+BL-00018,2026-01-31,credit_drawdown,billing,MOCK,,session_replay,2026-01,1000000,2325.00,2325.00,,Credit drawn down at list price
+BL-00019,2026-01-31,credit_revenue_recognized,revenue_engine,MOCK,,event_analytics,2026-01,,5040.00,6300.00,,Credit consumed at list x 0.8
+BL-00020,2026-01-31,credit_revenue_recognized,revenue_engine,MOCK,,feature_flags,2026-01,,2320.00,2900.00,,Credit consumed at list x 0.8
+BL-00021,2026-01-31,credit_revenue_recognized,revenue_engine,MOCK,,session_replay,2026-01,,1860.00,2325.00,,Credit consumed at list x 0.8
+BL-00022,2026-02-01,lag_estimate_reversal,revenue_engine,HOOD,,,2026-01,,32.25,,,Reverse 2026-01 lag estimate
+BL-00023,2026-02-03,invoice_issued,billing,HOOD,INV-2026-01-HOOD,,2026-01,,3225.00,,,"Invoice issued, due 2026-03-05"
+BL-00024,2026-02-03,invoice_issued,billing,TELA,INV-2026-01-TELA,,2026-01,,6450.00,,,"Invoice issued, due 2026-02-18"
+BL-00025,2026-02-06,late_usage_rated,billing,HOOD,INV-2026-02-HOOD,event_analytics,2026-01,2000000,40.00,40.00,EVT-000281,"January usage, processed after the close cutoff"
+BL-00026,2026-02-10,credit_memo,billing,TELA,INV-2026-01-TELA,,,,1500.00,,ADJ-2026-02-001,price_concession: January event volume included a misconfigured test environment
+BL-00027,2026-02-17,payment_applied,billing,TELA,INV-2026-01-TELA,,,,4950.00,,PAY-0004,Payment received
+BL-00028,2026-02-28,usage_rated,billing,HOOD,,event_analytics,2026-02,30000000,900.00,900.00,,Usage rated at close
+BL-00029,2026-02-28,usage_rated,billing,HOOD,,feature_flags,2026-02,20000000,1400.00,1400.00,,Usage rated at close
+BL-00030,2026-02-28,usage_rated,billing,HOOD,,session_replay,2026-02,300000,925.00,925.00,,Usage rated at close
+BL-00031,2026-02-28,usage_rated,billing,TELA,,event_analytics,2026-02,120000000,2700.00,2700.00,,Usage rated at close
+BL-00032,2026-02-28,usage_rated,billing,TELA,,feature_flags,2026-02,12000000,1000.00,1000.00,,Usage rated at close
+BL-00033,2026-02-28,usage_rated,billing,TELA,,session_replay,2026-02,400000,1000.00,1125.00,,Usage rated at close
+BL-00034,2026-02-28,lag_estimate,revenue_engine,HOOD,,,2026-02,,32.25,,,Lag estimate: 1.00% of 2026-02 processed usage revenue
+BL-00035,2026-02-28,credit_drawdown,billing,MOCK,,event_analytics,2026-02,400000000,8300.00,8300.00,,Credit drawn down at list price
+BL-00036,2026-02-28,credit_drawdown,billing,MOCK,,feature_flags,2026-02,60000000,3400.00,3400.00,,Credit drawn down at list price
+BL-00037,2026-02-28,credit_drawdown,billing,MOCK,,session_replay,2026-02,1500000,3325.00,3325.00,,Credit drawn down at list price
+BL-00038,2026-02-28,credit_revenue_recognized,revenue_engine,MOCK,,event_analytics,2026-02,,6640.00,8300.00,,Credit consumed at list x 0.8
+BL-00039,2026-02-28,credit_revenue_recognized,revenue_engine,MOCK,,feature_flags,2026-02,,2720.00,3400.00,,Credit consumed at list x 0.8
+BL-00040,2026-02-28,credit_revenue_recognized,revenue_engine,MOCK,,session_replay,2026-02,,2660.00,3325.00,,Credit consumed at list x 0.8
+BL-00041,2026-03-01,lag_estimate_reversal,revenue_engine,HOOD,,,2026-02,,32.25,,,Reverse 2026-02 lag estimate
+BL-00042,2026-03-02,payment_applied,billing,HOOD,INV-2026-01-HOOD,,,,3225.00,,PAY-0005,Payment received
+BL-00043,2026-03-03,invoice_issued,billing,HOOD,INV-2026-02-HOOD,,2026-02,,3265.00,,,"Invoice issued, due 2026-04-02"
+BL-00044,2026-03-03,invoice_issued,billing,TELA,INV-2026-02-TELA,,2026-02,,4700.00,,,"Invoice issued, due 2026-03-18"
+BL-00045,2026-03-10,late_usage_rated,billing,HOOD,INV-2026-03-HOOD,event_analytics,2026-01,2500000,50.00,50.00,EVT-000178,"January usage, reprocessed after a system fix"
+BL-00046,2026-03-30,payment_applied,billing,HOOD,INV-2026-02-HOOD,,,,3265.00,,PAY-0006,Payment received
+BL-00047,2026-03-31,usage_rated,billing,HOOD,,event_analytics,2026-03,30000000,900.00,900.00,,Usage rated at close
+BL-00048,2026-03-31,usage_rated,billing,HOOD,,feature_flags,2026-03,20000000,1400.00,1400.00,,Usage rated at close
+BL-00049,2026-03-31,usage_rated,billing,HOOD,,session_replay,2026-03,300000,925.00,925.00,,Usage rated at close
+BL-00050,2026-03-31,usage_rated,billing,TELA,,event_analytics,2026-03,100000000,2300.00,2300.00,,Usage rated at close
+BL-00051,2026-03-31,usage_rated,billing,TELA,,feature_flags,2026-03,10000000,900.00,900.00,,Usage rated at close
+BL-00052,2026-03-31,usage_rated,billing,TELA,,session_replay,2026-03,300000,925.00,925.00,,Usage rated at close
+BL-00053,2026-03-31,lag_estimate,revenue_engine,HOOD,,,2026-03,,32.25,,,Lag estimate: 1.00% of 2026-03 processed usage revenue
+BL-00054,2026-03-31,credit_drawdown,billing,MOCK,,event_analytics,2026-03,350000000,7300.00,7300.00,,Credit drawn down at list price
+BL-00055,2026-03-31,credit_drawdown,billing,MOCK,,feature_flags,2026-03,55000000,3150.00,3150.00,,Credit drawn down at list price
+BL-00056,2026-03-31,credit_drawdown,billing,MOCK,,session_replay,2026-03,1200000,2725.00,2725.00,,Credit drawn down at list price
+BL-00057,2026-03-31,credit_revenue_recognized,revenue_engine,MOCK,,event_analytics,2026-03,,5840.00,7300.00,,Credit consumed at list x 0.8
+BL-00058,2026-03-31,credit_revenue_recognized,revenue_engine,MOCK,,feature_flags,2026-03,,2520.00,3150.00,,Credit consumed at list x 0.8
+BL-00059,2026-03-31,credit_revenue_recognized,revenue_engine,MOCK,,session_replay,2026-03,,2180.00,2725.00,,Credit consumed at list x 0.8
+BL-00060,2026-04-01,lag_estimate_reversal,revenue_engine,HOOD,,,2026-03,,32.25,,,Reverse 2026-03 lag estimate
+BL-00061,2026-04-02,invoice_issued,billing,HOOD,INV-2026-03-HOOD,,2026-03,,3275.00,,,"Invoice issued, due 2026-05-02"
+BL-00062,2026-04-02,invoice_issued,billing,TELA,INV-2026-03-TELA,,2026-03,,4125.00,,,"Invoice issued, due 2026-04-17"
+BL-00063,2026-04-07,payment_applied,billing,TELA,INV-2026-02-TELA,,,,4700.00,,PAY-0007,Payment received

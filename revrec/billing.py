@@ -38,12 +38,14 @@ LATE_USAGE_LABELS = {  # SPEC 3.2, 5
 MONTH_NAMES = {"2025-12": "December", "2026-01": "January", "2026-02": "February", "2026-03": "March"}
 
 # Ledger rows sort by date, then in this order, so ledger_ids never change between runs.
-EVENT_ORDER = ["opening_balance", "credit_invoice_issued", "invoice_issued", "usage_rated",
-               "late_usage_rated", "credit_drawdown", "credit_memo", "payment_applied"]
+# The revenue engine's events (step 5) are included so the whole ledger has one numbering.
+EVENT_ORDER = ["opening_balance", "lag_estimate_reversal", "credit_invoice_issued", "invoice_issued",
+               "usage_rated", "lag_estimate", "late_usage_rated", "credit_drawdown",
+               "credit_revenue_recognized", "credit_memo", "payment_applied"]
 
 LINE_COLUMNS = ["invoice_id", "customer_id", "issue_date", "due_date", "usage_month", "line_no",
                 "line_type", "product", "tier", "units", "unit_price", "amount", "description"]
-LEDGER_COLUMNS = ["ledger_id", "event_date", "event_type", "customer_id", "invoice_id", "product",
+LEDGER_COLUMNS = ["ledger_id", "event_date", "event_type", "origin", "customer_id", "invoice_id", "product",
                   "usage_month", "quantity", "amount", "list_amount", "source_ref", "description"]
 
 
@@ -194,13 +196,8 @@ def invoice_totals(lines):
 def build_ledger(inputs, lines, payments):
     events = []
 
-    def add(event_date, event_type, customer, amount, invoice_id="", product="", usage_month="",
-            quantity="", list_amount="", source_ref="", description=""):
-        events.append({"event_date": str(event_date), "event_type": event_type, "customer_id": customer,
-                       "invoice_id": invoice_id, "product": product, "usage_month": usage_month,
-                       "quantity": quantity, "amount": money(amount),
-                       "list_amount": money(list_amount) if list_amount != "" else "",
-                       "source_ref": source_ref, "description": description})
+    def add(*args, **kwargs):
+        events.append(ledger_event(*args, origin="billing", **kwargs))
 
     # SPEC 5: opening unbilled AR for December usage.
     for row in inputs.opening[inputs.opening.account == "unbilled_ar"].itertuples():
@@ -243,7 +240,21 @@ def build_ledger(inputs, lines, payments):
         add(row.received_date, "payment_applied", row.customer_id, row.amount, invoice_id=row.invoice_id,
             source_ref=row.payment_id, description="Payment received")
 
-    ledger = pd.DataFrame(events)
+    return number_ledger(events)
+
+
+def ledger_event(event_date, event_type, customer, amount, origin, invoice_id="", product="", usage_month="",
+                 quantity="", list_amount="", source_ref="", description=""):
+    return {"event_date": str(event_date), "event_type": event_type, "origin": origin, "customer_id": customer,
+            "invoice_id": invoice_id, "product": product, "usage_month": usage_month,
+            "quantity": quantity, "amount": money(amount),
+            "list_amount": money(list_amount) if list_amount != "" else "",
+            "source_ref": source_ref, "description": description}
+
+
+def number_ledger(events):
+    """Sort events into a fixed order and assign ledger_ids, so reruns give identical ids."""
+    ledger = pd.DataFrame(events).drop(columns="ledger_id", errors="ignore")
     ledger["order"] = ledger.event_type.map(EVENT_ORDER.index)
     ledger = ledger.sort_values(["event_date", "order", "customer_id", "invoice_id", "product", "usage_month"],
                                 kind="stable").drop(columns="order").reset_index(drop=True)
@@ -258,8 +269,10 @@ def ar_balances(ledger, as_of):
     for row in rows.itertuples():
         amount = Decimal(row.amount)
         c = row.customer_id
-        if row.event_type in ("opening_balance", "usage_rated", "late_usage_rated"):
+        if row.event_type in ("opening_balance", "usage_rated", "late_usage_rated", "lag_estimate"):
             unbilled[c] = unbilled.get(c, ZERO) + amount
+        elif row.event_type == "lag_estimate_reversal":  # SPEC 3.2: estimate reverses next month
+            unbilled[c] = unbilled.get(c, ZERO) - amount
         elif row.event_type == "invoice_issued":  # moves unbilled AR to billed AR
             unbilled[c] = unbilled.get(c, ZERO) - amount
             billed[c] = billed.get(c, ZERO) + amount

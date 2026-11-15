@@ -192,6 +192,7 @@ def generate(data_dir):
               ["key", "value", "note"],
               [["close_cutoff_business_day", "3", "SPEC 3.2: close cutoff is business day 3"],
                ["lag_rate", "0.01", "SPEC 3.2: historical lag rate, Harry Hood only"],
+               ["lag_estimate_customers", "HOOD", "SPEC 3.2: customers whose history shows post-cutoff lag"],
                ["close_threshold_pct", "0.005", "SPEC 3.2: % of the month's total revenue, in aggregate"],
                ["breakage_pct", "0", "SPEC 3.3: expected breakage constrained to zero"],
                ["collections_reminder_days", "5", "SPEC 3.4: reminder at day 5 past due"],

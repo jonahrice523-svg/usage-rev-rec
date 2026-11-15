@@ -72,12 +72,14 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
 - **HM-side lag (estimate, then true-up):**
   - Some usage received in a month isn't processed until after the close cutoff (business day 3), because of pipeline backlogs, failed metering jobs, or outage replays.
   - At close, HM accrues an estimate for it: the historical lag rate in `assumptions.csv` × the month's processed usage revenue, by customer. It's recorded as revenue and unbilled receivable. (Applying the lag rate to dollars rather than re-rating units through the tiers is a simplification, noted in the memo.)
-  - The estimate applies only to customers whose usage history shows post-cutoff lag. In this model, that is Harry Hood only.
+  - The estimate applies only to customers whose usage history shows post-cutoff lag. In this model, that is Harry Hood only (`lag_estimate_customers` in `assumptions.csv`).
+  - Each month-end estimate reverses on the 1st of the next month, and actual late usage is recognized when it's rated. The reversal plus the actual is the change in estimate for that month.
   - When the usage is processed, it's billed on a true-up line on the next invoice. The difference between actual and estimate is recognized in the current month as a change in estimate, not an error correction (ASC 250).
 - **Unusual items and the close threshold:**
   - Items the estimate doesn't anticipate (for example, a bug fix that reprocesses a closed month) are measured in aggregate across all customers for the month, not item by item.
   - Below the close threshold in `assumptions.csv` (a percentage of the month's total revenue), they're recorded in the current month and logged in `passed_adjustments_log.csv`, so the cumulative effect stays visible.
-  - Above the threshold, or if qualitatively significant (for example, it would change a reported growth metric), they're evaluated as a possible prior-period error under ASC 250.
+  - Above the threshold, or if qualitatively significant (for example, it would change a reported growth metric), they're evaluated as a possible prior-period error under ASC 250. The model logs them as exceptions for review and doesn't record them automatically.
+  - The threshold base is the month's total revenue, including the unusual items.
   - The model assumes the threshold was agreed with the auditors and written into the close policy, set below their "clearly trivial" level.
 - **Duplicates:** Usage rows are deduplicated on `event_id` before pricing. Duplicates are logged as exceptions and never billed.
 
@@ -87,11 +89,12 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
   - **Why:** The transaction price is the $80,000 paid, not the $100,000 of list-value credit.
   - **Why usage-based:** A promise of a fixed quantity that diminishes with customer usage is a promise to deliver that service, not a stand-ready obligation, so a usage-based measure of progress fits (RR 6.4.3; **Example RR 6-10**, 100 support hours recognized as used).
   - **Two balances side by side:** the **credit balance** (list value, what the customer sees) and the **contract liability** (cash value, what the books show). The contract liability always equals the remaining credit × 0.80.
+  - **Rounding:** revenue to date = 0.80 × credit consumed to date, rounded to cents, less revenue already recognized. This keeps the contract liability equal to remaining credit × 0.80 to the cent.
 - **Right to invoice doesn't apply.** The upfront payment means invoiced amounts don't track value transferred (RR 6.4.1.1 discusses upfront payments as an indicator against the expedient).
 - **Breakage judgment:**
   - Unused credit at term end is breakage. If HM expects to be entitled to it, breakage is recognized in proportion to credit consumed. Otherwise, it's recognized when the likelihood of use becomes remote (ASC 606-10-55-48; RR 7.4; works like **Example RR 7-12**).
   - The estimate is subject to the variable consideration constraint: include it only to the extent a significant reversal of cumulative revenue is not probable (ASC 606-10-32-11; RR 4.3.2).
-  - **Model decision:** HM has no history with credit contracts, which is a named factor pointing toward constraint (ASC 606-10-32-12(c)). So **expected breakage is constrained to $0** for now, and the estimate is reassessed each month.
+  - **Model decision:** HM has no history with credit contracts, which is a named factor pointing toward constraint (ASC 606-10-32-12(c)). So **expected breakage is constrained to $0** for now, and the estimate is reassessed each month. The revenue schedule shows a $0 breakage row each month to make the reassessment visible.
   - The memo explains what evidence would change that, and that unused credit would need to be checked against unclaimed property (escheat) laws before any breakage is recognized (RR 7.4).
 
 ### 3.4 Billing limits, disputes, and collections (Tela)
@@ -104,7 +107,7 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
 - **The billing question:** In early February, Tela's finance team asks why January's invoice is higher than December's. The answer comes from the model's per-customer usage-to-invoice trace. The repo includes the reply as `output/billing_reply_tela.md`, written in plain language for a customer.
 - **The dispute:** Tela says some January event volume came from a misconfigured test environment and asks for relief. HM issues a **$1,500 credit memo** in February.
   - **Classification:** This is a **price concession**, not a credit loss. It's an adjustment outside the original contract terms, given because of customer dissatisfaction, not because Tela can't pay (RR 4.3.3.1).
-  - **Timing:** January's service is already delivered, so the change in transaction price reduces revenue in **February**, the period the price changes (ASC 606-10-32-43; RR 5.5.2). It's recorded as contra-revenue.
+  - **Timing:** January's service is already delivered, so the change in transaction price reduces revenue in **February**, the period the price changes (ASC 606-10-32-43; RR 5.5.2). It's recorded as contra-revenue and tagged to event analytics in the revenue schedule, since the dispute concerned event volume.
   - **Policy question for the memo:** A reporting entity that expects to give concessions, or has a practice of doing so, should reduce the transaction price up front (RR 4.3.3.1; **Example RR 4-9**). At what point does HM's history become a "practice"?
 - **Collections:**
   - Tela is on **Net 15** terms.
@@ -125,6 +128,7 @@ The posting mentions owning the integration between a billing ledger and the acc
 - **Billing ledger** (`output/billing_ledger.csv`): the system of record for every billing event, including usage rated, invoice issued, credit drawn down, credit memo, and payment applied. One row per event, with an immutable `ledger_id`.
   - It also carries the January 1 opening unbilled AR (section 5), so rollforwards and the GL start from the ledger.
   - Events after March 31 (the March invoices issued April 2, Tela's April 7 payment) are kept at their real dates. Every Q1 report and rollforward cuts off at March 31.
+  - It also carries the revenue engine's entries (lag estimates and reversals, and credit revenue at 0.80), marked `origin = revenue_engine`, so the GL still comes only from the ledger. Billing events are marked `origin = billing`.
 - **Account mapping** (`config/account_mapping.csv`): maps each billing ledger event type to GL debits and credits. This file is where finance owns the integration logic.
 - **GL export** (`output/gl_export.csv`): journal entries generated only from the billing ledger through the mapping, summarized by day, account, and customer, with a `ledger_id` trail back to the source rows.
 - **Integration controls:**
@@ -211,7 +215,10 @@ Harry Hood's February totals include the customer-side delay batch and the time-
 | 3c | Tela March revenue (events $2,300 + replay $925, under the cap + flags $900) | $4,125.00 |
 | 4 | March total revenue (Famous Mockingbird $10,540 + Harry Hood $3,275 + Tela $4,125); 0.5% close threshold; the $50 bug fix falls below it | $17,940.00 and $89.70 |
 | 5 | Billed AR at March 31 (Tela's February invoice only, 13 days past due) | $4,700.00 |
-| 5a | Unbilled AR at March 31 from usage (Harry Hood $3,275 including the $50 bug fix + Tela $4,125; March usage is invoiced April 2). Step 5 adds Harry Hood's $32.25 March lag estimate, for $7,432.25. | $7,400.00 |
+| 5a | Unbilled AR at March 31 from usage (Harry Hood $3,275 including the $50 bug fix + Tela $4,125; March usage is invoiced April 2) | $7,400.00 |
+| 5b | Unbilled AR at March 31 including Harry Hood's $32.25 March lag estimate | $7,432.25 |
+| 6 | Total revenue by month: January (Harry Hood $3,257.25 + Famous Mockingbird $9,220 + Tela $6,450) and February (Harry Hood $3,265 + Famous Mockingbird $12,020 + Tela $3,200). March is check 4. | $18,927.25 and $18,485.00 |
+| 6a | Q1 total revenue ($18,927.25 + $18,485.00 + $17,940.00) | $55,352.25 |
 
 ---
 

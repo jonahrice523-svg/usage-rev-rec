@@ -223,6 +223,7 @@ def test_assumptions(data_dir):
     values = read(data_dir, "assumptions.csv").set_index("key")["value"]
     assert values["close_cutoff_business_day"] == "3"  # SPEC 3.2
     assert Decimal(values["lag_rate"]) == Decimal("0.01")  # SPEC 5
+    assert values["lag_estimate_customers"] == "HOOD"  # SPEC 3.2
     assert Decimal(values["close_threshold_pct"]) == Decimal("0.005")  # SPEC 5
     assert Decimal(values["breakage_pct"]) == 0  # SPEC 3.3
     assert values["collections_reminder_days"] == "5"  # SPEC 3.4

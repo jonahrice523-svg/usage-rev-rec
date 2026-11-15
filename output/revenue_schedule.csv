@@ -1,0 +1,39 @@
+month,customer_id,product,policy,amount,spec_ref,ledger_ids,note
+2026-01,HOOD,,lag_estimate,32.25,3.2,BL-00015,
+2026-01,HOOD,event_analytics,usage,900.00,3.1,BL-00009,
+2026-01,HOOD,feature_flags,usage,1400.00,3.1,BL-00010,
+2026-01,HOOD,session_replay,usage,925.00,3.1,BL-00011,
+2026-01,MOCK,,breakage,0.00,3.3,,Expected breakage constrained to zero (SPEC 3.3)
+2026-01,MOCK,event_analytics,credit_drawdown,5040.00,3.3,BL-00019,
+2026-01,MOCK,feature_flags,credit_drawdown,2320.00,3.3,BL-00020,
+2026-01,MOCK,session_replay,credit_drawdown,1860.00,3.3,BL-00021,
+2026-01,TELA,event_analytics,usage,4300.00,3.1,BL-00012,
+2026-01,TELA,feature_flags,usage,1150.00,3.1,BL-00013,
+2026-01,TELA,session_replay,usage,1000.00,3.1,BL-00014,
+2026-02,HOOD,,lag_estimate,32.25,3.2,BL-00034,
+2026-02,HOOD,,lag_estimate_reversal,-32.25,3.2,BL-00022,
+2026-02,HOOD,event_analytics,lag_true_up,40.00,3.2,BL-00025,"Actual late usage, rated when processed"
+2026-02,HOOD,event_analytics,usage,900.00,3.1,BL-00028,
+2026-02,HOOD,feature_flags,usage,1400.00,3.1,BL-00029,
+2026-02,HOOD,session_replay,usage,925.00,3.1,BL-00030,
+2026-02,MOCK,,breakage,0.00,3.3,,Expected breakage constrained to zero (SPEC 3.3)
+2026-02,MOCK,event_analytics,credit_drawdown,6640.00,3.3,BL-00038,
+2026-02,MOCK,feature_flags,credit_drawdown,2720.00,3.3,BL-00039,
+2026-02,MOCK,session_replay,credit_drawdown,2660.00,3.3,BL-00040,
+2026-02,TELA,event_analytics,concession,-1500.00,3.4,BL-00026,ADJ-2026-02-001
+2026-02,TELA,event_analytics,usage,2700.00,3.1,BL-00031,
+2026-02,TELA,feature_flags,usage,1000.00,3.1,BL-00032,
+2026-02,TELA,session_replay,usage,1000.00,3.1,BL-00033,
+2026-03,HOOD,,lag_estimate,32.25,3.2,BL-00053,
+2026-03,HOOD,,lag_estimate_reversal,-32.25,3.2,BL-00041,
+2026-03,HOOD,event_analytics,unusual_item,50.00,3.2,BL-00045,"January usage, reprocessed after a system fix (below the 2026-03 close threshold of $89.70)"
+2026-03,HOOD,event_analytics,usage,900.00,3.1,BL-00047,
+2026-03,HOOD,feature_flags,usage,1400.00,3.1,BL-00048,
+2026-03,HOOD,session_replay,usage,925.00,3.1,BL-00049,
+2026-03,MOCK,,breakage,0.00,3.3,,Expected breakage constrained to zero (SPEC 3.3)
+2026-03,MOCK,event_analytics,credit_drawdown,5840.00,3.3,BL-00057,
+2026-03,MOCK,feature_flags,credit_drawdown,2520.00,3.3,BL-00058,
+2026-03,MOCK,session_replay,credit_drawdown,2180.00,3.3,BL-00059,
+2026-03,TELA,event_analytics,usage,2300.00,3.1,BL-00050,
+2026-03,TELA,feature_flags,usage,900.00,3.1,BL-00051,
+2026-03,TELA,session_replay,usage,925.00,3.1,BL-00052,

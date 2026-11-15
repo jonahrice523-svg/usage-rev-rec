@@ -1,7 +1,7 @@
 """Run the quarter's revenue close end to end.
 
 So far: synthetic data (step 2), pricing (step 3), invoices, payments,
-and the billing ledger (step 4). Each later step in SPEC.md section 8
+and the billing ledger (step 4), and the revenue engine (step 5). Each later step in SPEC.md section 8
 adds its piece here.
 """
 
@@ -10,6 +10,7 @@ from pathlib import Path
 from revrec.billing import ar_balances, invoice_totals, run_billing
 from revrec.generate_data import generate
 from revrec.pricing import load_billing_limits, load_rate_card, price_monthly_usage
+from revrec.revenue import revenue_by, run_revenue
 from revrec.usage import load_usage, summarize
 
 ROOT = Path(__file__).parent
@@ -28,7 +29,25 @@ BUILD_STEPS = [
     "9. Workpapers and the Tela billing reply",
     "10. run.py runs the whole quarter's close",
 ]
-STEPS_DONE = 4
+STEPS_DONE = 5
+
+
+def print_revenue_summary(data, output, billing_ledger):
+    """Step 5: revenue schedule, and the revenue engine's entries added to the ledger."""
+    ledger, schedule, exceptions = run_revenue(data, output, billing_ledger)
+    by = revenue_by(schedule, "customer_id", "month")
+    months = ["2026-01", "2026-02", "2026-03"]
+    print("Revenue recognized (output/revenue_schedule.csv):")
+    print(f"  {'Customer':<9}" + "".join(f"{m:>12}" for m in months) + f"{'Q1':>12}")
+    for customer in ["HOOD", "MOCK", "TELA"]:
+        values = [by.get((customer, m), 0) for m in months]
+        print(f"  {customer:<9}" + "".join(f"{v:>12,.2f}" for v in values) + f"{sum(values):>12,.2f}")
+    totals = [sum(v for (c, m), v in by.items() if m == month) for month in months]
+    print(f"  {'Total':<9}" + "".join(f"{v:>12,.2f}" for v in totals) + f"{sum(totals):>12,.2f}")
+    _, unbilled = ar_balances(ledger, "2026-03-31")
+    print(f"Unbilled AR at March 31 including the lag estimate: {sum(unbilled.values()):,.2f}")
+    print(f"Billing ledger now has {len(ledger)} events; unusual-item exceptions: {len(exceptions)}")
+    print()
 
 
 def print_billing_summary(data, output):
@@ -40,8 +59,9 @@ def print_billing_summary(data, output):
     print(f"Payments written to data/payments.csv: {len(payments)}")
     print(f"Billing ledger (output/billing_ledger.csv): {len(ledger)} events")
     billed, unbilled = ar_balances(ledger, "2026-03-31")
-    print(f"AR at March 31: billed {sum(billed.values()):,.2f}, unbilled {sum(unbilled.values()):,.2f}")
+    print(f"AR at March 31 from billing: billed {sum(billed.values()):,.2f}, unbilled {sum(unbilled.values()):,.2f}")
     print()
+    return ledger
 
 
 def print_pricing_summary(data):
@@ -79,7 +99,8 @@ def main():
     print()
 
     print_pricing_summary(ROOT / "data")  # step 3
-    print_billing_summary(ROOT / "data", ROOT / "output")  # step 4
+    billing_ledger = print_billing_summary(ROOT / "data", ROOT / "output")  # step 4
+    print_revenue_summary(ROOT / "data", ROOT / "output", billing_ledger)  # step 5
 
     print("Build progress (SPEC section 8):")
     for number, step in enumerate(BUILD_STEPS, start=1):
