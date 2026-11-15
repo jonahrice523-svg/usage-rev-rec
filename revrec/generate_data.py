@@ -168,12 +168,25 @@ def generate(data_dir):
               [["ADJ-2026-02-001", TELA, "INV-2026-01-TELA", "1500.00", "2026-02-10",
                 "January event volume included a misconfigured test environment", "price_concession"]])
 
-    # SPEC 5: Tela's December 2025 invoice. Reference only for the billing reply; never revenue.
+    # SPEC 5: December 2025 invoices, issued January 2 from the opening unbilled AR.
+    # December usage is never recognized as revenue in the model period.
     write_csv(data_dir / "prior_period_invoices.csv",
               ["customer_id", "invoice_id", "product", "amount"],
-              [[TELA, "INV-2025-12-TELA", EVENTS, "2100.00"],
+              [[HOOD, "INV-2025-12-HOOD", EVENTS, "850.00"],
+               [HOOD, "INV-2025-12-HOOD", REPLAY, "900.00"],
+               [HOOD, "INV-2025-12-HOOD", FLAGS, "1350.00"],
+               [TELA, "INV-2025-12-TELA", EVENTS, "2100.00"],
                [TELA, "INV-2025-12-TELA", REPLAY, "900.00"],
                [TELA, "INV-2025-12-TELA", FLAGS, "800.00"]])
+
+    # SPEC 5: opening balances at January 1, 2026. Unbilled AR for December usage,
+    # offset to opening balance equity. No other opening balances.
+    write_csv(data_dir / "opening_balances.csv",
+              ["as_of", "account", "customer_id", "debit", "credit", "note"],
+              [["2026-01-01", "unbilled_ar", HOOD, "3100.00", "0.00", "December 2025 usage, invoiced January 2"],
+               ["2026-01-01", "opening_balance_equity", HOOD, "0.00", "3100.00", "Offset to opening unbilled AR"],
+               ["2026-01-01", "unbilled_ar", TELA, "3800.00", "0.00", "December 2025 usage, invoiced January 2"],
+               ["2026-01-01", "opening_balance_equity", TELA, "0.00", "3800.00", "Offset to opening unbilled AR"]])
 
     write_csv(data_dir / "assumptions.csv",
               ["key", "value", "note"],

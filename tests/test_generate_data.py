@@ -191,9 +191,32 @@ def test_adjustment_and_prior_period_invoice(data_dir):
     assert memo.classification == "price_concession"  # SPEC 3.4
 
     december = read(data_dir, "prior_period_invoices.csv")
-    total = sum(Decimal(a) for a in december.amount)
-    assert total == Decimal("3800.00")
-    assert total < Decimal("6450.00")  # January (SPEC 5, check 3) is noticeably higher
+    tela = sum(Decimal(a) for a in december[december.customer_id == "TELA"].amount)
+    assert tela == Decimal("3800.00")
+    assert tela < Decimal("6450.00")  # January (SPEC 5, check 3) is noticeably higher
+
+
+def test_opening_balances(data_dir):
+    # SPEC 5: unbilled AR for December usage at January 1, offset to opening equity; nothing else.
+    opening = read(data_dir, "opening_balances.csv")
+    assert set(opening.as_of) == {"2026-01-01"}
+    assert set(opening.account) == {"unbilled_ar", "opening_balance_equity"}
+    assert sum(Decimal(d) for d in opening.debit) == sum(Decimal(c) for c in opening.credit)
+
+    unbilled = opening[opening.account == "unbilled_ar"].set_index("customer_id")
+    assert set(unbilled.index) == {"HOOD", "TELA"}
+
+    # Each customer's opening unbilled AR equals its December invoice.
+    december = read(data_dir, "prior_period_invoices.csv")
+    for customer in ["HOOD", "TELA"]:
+        invoice_total = sum(Decimal(a) for a in december[december.customer_id == customer].amount)
+        assert Decimal(unbilled.loc[customer, "debit"]) == invoice_total
+    assert Decimal(unbilled.loc["TELA", "debit"]) == Decimal("3800.00")
+
+
+def test_january_business_day_2():
+    # SPEC 1: December invoices are issued on business day 2 of January.
+    assert business_day(2026, 1, 2) == date(2026, 1, 2)
 
 
 def test_assumptions(data_dir):

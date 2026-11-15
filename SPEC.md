@@ -25,7 +25,7 @@ A small, end-to-end model of one quarter of revenue accounting for a fictional u
 - Tiers are **graduated** (each unit is priced at its own tier's rate) and **reset every calendar month**.
 - Customers may set a **billing limit**: a dollar cap per product per month. Each month, the price is the lower of what the usage costs (after the free tier and tier pricing) or the cap. Usage above the cap is never billed.
 - Monthly invoices are issued on business day 2 for the prior month's usage, with Net 30 terms unless a customer's terms say otherwise (Tela is Net 15).
-- Business days are weekdays, with no holidays in the model period. Business day 2 is February 3 and March 3. Business day 3, the close cutoff, is February 4 and March 4.
+- Business days are weekdays, with no holidays in the model period. Business day 2 is January 2, February 3 and March 3. Business day 3, the close cutoff, is February 4 and March 4.
 
 ### Annual prepaid credit
 - Credit is sold at a **20% discount**: $100,000 of credit costs $80,000. It's invoiced upfront, Net 30, and noncancellable, with a 12-month term.
@@ -141,8 +141,9 @@ The GL export is ERP-agnostic. No real ERP's import format is assumed.
 | `contracts.csv` | contract | `contract_id`, `customer_id`, `contract_type` (payg / credit), `effective_from`, `effective_to`, `credit_value`, `cash_price` |
 | `rate_cards.csv` | product × tier | `product`, `tier_floor`, `tier_ceiling`, `unit_price` |
 | `usage_events.csv` | daily aggregate per customer per product | `event_id`, `customer_id`, `product`, `quantity`, `client_ts`, `received_ts`, `processed_ts`, `source` (`normal` / `bug_fix_reprocess`) |
-| `payments.csv` | payment, **generated in build step 4** from rules once invoices exist (Harry Hood pays in full before the due date; Famous Mockingbird pays January 28; Tela as in 3.4). Invoice IDs follow a fixed pattern, e.g. `INV-2026-01-TELA`. | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
-| `prior_period_invoices.csv` | Tela's December 2025 invoice by product. Reference only, for the billing reply in 3.4; never recognized as revenue. | `customer_id`, `invoice_id`, `product`, `amount` |
+| `payments.csv` | payment, **generated in build step 4** from rules once invoices exist (Harry Hood pays in full before the due date; Famous Mockingbird pays January 28; Tela as in 3.4; Harry Hood and Tela pay their December invoices on time in January). Invoice IDs follow a fixed pattern, e.g. `INV-2026-01-TELA`. | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
+| `prior_period_invoices.csv` | December 2025 invoices for Harry Hood and Tela, by product. They're issued January 2 from the opening unbilled AR. Tela's also supports the billing reply in 3.4. December usage is never recognized as revenue in the model period. | `customer_id`, `invoice_id`, `product`, `amount` |
+| `opening_balances.csv` | balance at January 1, 2026 | `as_of`, `account`, `customer_id`, `debit`, `credit`, `note` |
 | `adjustments.csv` | credit memo | `adjustment_id`, `customer_id`, `invoice_id`, `amount`, `date`, `reason`, `classification` |
 | `assumptions.csv` | assumption | `key`, `value`, `note` (close cutoff day, historical lag rate, close threshold as % of the month's revenue, breakage %, collections reminder days) |
 
@@ -151,7 +152,15 @@ Keep the data small enough to inspect by eye: daily aggregates, with a few delib
 - one batch of 2,000,000 events received January 31 but processed February 6, after the cutoff (business day 3 is February 4). This is HM-side lag: January revenue via the estimate, true-up in February.
 - one batch with a January 31 `client_ts` received February 1 (customer-side delay: February usage, no true-up)
 - one event at 11pm Pacific on January 31, which is February 1 in UTC (time zone: February usage)
-- one unusual item: in March, a bug fix reprocesses $50 of Harry Hood's January usage (2,500,000 events at January's tier 3 rate), marked `source = bug_fix_reprocess`. It's below the close threshold, so it's recorded in March and logged in `passed_adjustments_log.csv` (section 3.2). It doesn't change any January or February result below.
+- one unusual item: in March, a bug fix reprocesses $50 of Harry Hood's January usage (2,500,000 events at January's tier 3 rate), marked `source = bug_fix_reprocess`. It's below the close threshold, so it's recorded in March and logged in `passed_adjustments_log.csv` (section 3.2). It's billed on the March invoice as a separate line labeled "January usage, reprocessed after a system fix." It doesn't change any January or February result below.
+
+### Opening balances (January 1, 2026)
+
+Harry Hood and Tela had contracts in 2025, so both have December usage that was unbilled at January 1:
+- Unbilled AR: Harry Hood $3,100.00 and Tela $3,800.00. Each is offset to an opening balance equity account. Each equals that customer's December invoice in `prior_period_invoices.csv`.
+- Both December invoices are issued January 2 (business day 2) and paid on time in January.
+- There are no other opening balances: no billed AR, no contract liability (Famous Mockingbird's contract starts January 1), and no lag estimate.
+- Every rollforward in section 6 starts from these balances.
 
 ### Check scenarios: fixed inputs and expected results
 
@@ -213,6 +222,7 @@ Harry Hood's February totals include the customer-side delay batch and the time-
    - Contract liability: opening + invoiced − recognized = closing
    - Credit balance at list value: opening + purchased − consumed = closing
    - AR, billed and unbilled: opening + billed − cash − credits = closing
+   - Opening balances come from `opening_balances.csv` (section 5)
 5. `ar_aging.csv` and `collections_log.csv`
 
 **Reconciliation and close**

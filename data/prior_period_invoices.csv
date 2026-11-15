@@ -1,4 +1,7 @@
 customer_id,invoice_id,product,amount
+HOOD,INV-2025-12-HOOD,event_analytics,850.00
+HOOD,INV-2025-12-HOOD,session_replay,900.00
+HOOD,INV-2025-12-HOOD,feature_flags,1350.00
 TELA,INV-2025-12-TELA,event_analytics,2100.00
 TELA,INV-2025-12-TELA,session_replay,900.00
 TELA,INV-2025-12-TELA,feature_flags,800.00
