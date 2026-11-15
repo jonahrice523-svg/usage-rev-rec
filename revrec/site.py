@@ -408,20 +408,23 @@ def clean_label(label):
 
 
 def section_judgment(sections):
-    cards = []
+    # One collapsed row per call: number, title and position always visible; click to read the memo text.
+    rows = []
     for number, ((title, blocks), position) in enumerate(zip(sections, POSITIONS), start=1):
-        more = (f"<details><summary>Read the reasoning</summary>{blocks_to_html(blocks)}</details>" if blocks
+        memo = (f'<div class="jc-memo">{blocks_to_html(blocks)}</div>' if blocks
                 else '<p class="muted small">Full reasoning in MEMO.md (in progress).</p>')
         note = f'<p class="model-note">{esc(MODEL_NOTES[number])}</p>' if number in MODEL_NOTES else ""
-        cards.append(f'<article class="card judgment"><p class="num-badge">{number}</p><h3>{esc(title)}</h3>'
-                     f'<p class="position">{esc(position)}</p>{note}{more}</article>')
+        rows.append(f'<details class="jc"><summary><span class="jc-num">{number}</span>'
+                    f'<span class="jc-text"><span class="jc-title">{esc(title)}</span>'
+                    f'<span class="jc-position">{esc(position)}</span></span></summary>'
+                    f'<div class="jc-body">{note}{memo}</div></details>')
     return f"""
 <section id="judgment">
   <p class="eyebrow">#N · Seven judgment calls</p>
   <h2>The parts a spreadsheet can't decide</h2>
-  <p>Where I landed on each open question, from my policy memo. Some positions go further than the
-  model does; where they do, the card says so.</p>
-  <div class="cards two">{"".join(cards)}</div>
+  <p>Where I landed on each open question, from my policy memo. Click any call for the full reasoning.
+  Some positions go further than the model does; where they do, the call says so.</p>
+  <div class="jc-list">{"".join(rows)}</div>
   <p class="small"><a href="{REPO}/blob/main/MEMO.md">Read the full memo, MEMO.md →</a></p>
 </section>"""
 
@@ -634,13 +637,25 @@ padding:8px 0;border-bottom:1px solid var(--line)}
 .waterfall .small{margin:12px 0 0}
 .unexplained{font-size:1.25rem;margin-top:20px}
 .unexplained strong{color:var(--good)}
-#judgment .cards{align-items:start}
-.judgment{position:relative;padding-top:18px}
-.num-badge{font-weight:700;color:var(--muted);margin:0 0 4px}
-.position{font-size:1.05rem;font-weight:500}
+.jc-list{display:flex;flex-direction:column;gap:6px;margin-top:20px}
+.jc{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:0}
+.jc summary{list-style:none;display:flex;gap:12px;align-items:flex-start;padding:12px 16px;cursor:pointer;
+color:var(--ink);font-weight:400;font-size:1rem}
+.jc summary::-webkit-details-marker{display:none}
+.jc summary::before{content:"";flex:none;width:7px;height:7px;margin-top:.55em;border-right:2px solid var(--ink-2);
+border-bottom:2px solid var(--ink-2);transform:rotate(-45deg);transition:transform .15s}
+.jc[open] summary::before{transform:rotate(45deg)}
+.jc[open] summary{margin-bottom:0;border-bottom:1px solid var(--line)}
+.jc summary:hover{background:var(--surface)}
+.jc-num{flex:none;font-weight:700;color:var(--muted);min-width:1em}
+.jc-text{display:flex;flex-direction:column;gap:2px}
+.jc-title{font-weight:700}
+.jc-position{color:var(--ink-2);font-size:.95rem}
+.jc-body{padding:14px 16px 6px 54px}
 .model-note{font-size:.88rem;color:var(--ink-2);border-left:3px solid var(--axis);padding-left:10px}
-.judgment details p,.judgment details li{color:var(--ink-2);font-size:.95rem}
-.judgment ul{padding-left:1.2em}
+.jc-memo p,.jc-memo li{color:var(--ink-2);font-size:.95rem}
+.jc-memo ul{padding-left:1.2em}
+@media (max-width:640px){.jc-body{padding-left:16px}}
 .month .big{font-size:1.8rem;font-weight:700;margin:0}
 .table-card{margin-top:16px;overflow-x:auto}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.8rem;font-weight:700;white-space:nowrap}

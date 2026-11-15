@@ -38,7 +38,7 @@ def visible_text(page_html, drop_memo=True):
     """The page's text as a reader sees it, without scripts (and, by default, without the memo text)."""
     out = re.sub(r"<script.*?</script>", " ", page_html, flags=re.S)
     if drop_memo:
-        out = re.sub(r'<details><summary>Read the reasoning</summary>.*?</details>', " ", out, flags=re.S)
+        out = re.sub(r'<div class="jc-memo">.*?</div>', " ", out, flags=re.S)
     return html.unescape(re.sub(r"<[^>]+>", " ", out))
 
 
@@ -213,7 +213,7 @@ def test_judgment_cards_come_from_memo(page):
     for position in POSITIONS:
         assert position in text
     headings = re.findall(r"^### \d+\.\s*(.+)$", memo, flags=re.M)
-    cards = re.findall(r'<article class="card judgment">.*?<h3>(.*?)</h3>', page, re.S)
+    cards = re.findall(r'<span class="jc-title">(.*?)</span>', page, re.S)
     assert [html.unescape(c) for c in cards] == [h.strip() for h in headings]
     # The expanded text is MEMO.md's: the first paragraph of each section appears on the page.
     for _, blocks in sections:
@@ -226,7 +226,8 @@ def test_every_memo_paragraph_is_in_its_card(page):
     memo = (ROOT / "MEMO.md").read_text(encoding="utf-8")
     experience = re.findall(r"^\*\*From experience\.\*\*(.+)$", memo, flags=re.M)
     assert experience  # the memo has them, and they're checked with every other paragraph below
-    cards = re.findall(r'<article class="card judgment">(.*?)</article>', page, re.S)
+    cards = re.findall(r'<details class="jc">(.*?)</details>', page, re.S)
+    assert len(cards) == 7
     for _, blocks in memo_sections(memo):
         for block in blocks:
             plain = re.sub(r"\*\*|\*|\[([^\]]+)\]\([^)]+\)", r"\1", re.sub(r"^- ", "", block, flags=re.M))
