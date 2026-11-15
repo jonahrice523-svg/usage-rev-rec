@@ -255,6 +255,32 @@ Net revenue (4000 + 4010 + 4100 − 4900) is $55,352.25, which equals check 6a.
 
 At February 28, billed AR is Harry Hood's January invoice (paid March 2), and unbilled AR is Harry Hood's $3,225 + $40 true-up + $32.25 estimate, plus Tela's $4,700. At March 31, the AR aging shows one open invoice: Tela's February invoice, $4,700, 13 days past due, in the 1–30 bucket.
 
+**Check 9: reconciliation bridges** (each with zero unexplained difference)
+
+| Bridge | January | February | March |
+|---|---|---|---|
+| **B. Usage to invoice** | | | |
+| Usage at list price, after the free tier | 21,725.00 | 23,075.00 | 20,525.00 |
+| Capped by the billing limit | (525.00) | (125.00) | — |
+| Drawn from prepaid credit | (11,525.00) | (15,025.00) | (13,175.00) |
+| Late usage rated in the month | — | 40.00 | 50.00 |
+| = Usage invoices for the month | 9,675.00 | 7,965.00 | 7,400.00 |
+| **C. Usage to revenue** | | | |
+| Usage at list price, after the free tier | 21,725.00 | 23,075.00 | 20,525.00 |
+| Capped | (525.00) | (125.00) | — |
+| Credit discount (20% of drawdown) | (2,305.00) | (3,005.00) | (2,635.00) |
+| Lag estimate | 32.25 | 32.25 | 32.25 |
+| Reversal of last month's estimate | — | (32.25) | (32.25) |
+| Late usage (lag true-up; unusual item) | — | 40.00 | 50.00 |
+| Price concession | — | (1,500.00) | — |
+| = Revenue (schedule and GL) | 18,927.25 | 18,485.00 | 17,940.00 |
+| **D. Revenue to cash** | | | |
+| Revenue | 18,927.25 | 18,485.00 | 17,940.00 |
+| Timing of cash: change in unbilled AR | (2,807.25) | 1,710.00 | 565.00 |
+| Timing of cash: change in billed AR | — | (3,225.00) | (1,475.00) |
+| Prepaid credit: change in contract liability | 70,780.00 | (12,020.00) | (10,540.00) |
+| = Cash received (GL 1000) | 86,900.00 | 4,950.00 | 6,490.00 |
+
 ---
 
 ## 6. Outputs (in `output/`)
@@ -279,8 +305,14 @@ At February 28, billed AR is Harry Hood's January invoice (paid March 2), and un
 
 **Reconciliation and close**
 6. `reconciliation.md`: usage → invoice → revenue → cash per month, with every difference explained by a named reconciling item (free tier, capped, duplicate, lag estimate and true-up, credit drawdown, credit discount, concession, timing of cash)
-7. `close_checklist.md`: each revenue close step with an owner, a due day, and an automated pass/fail check (for example, "unbilled AR rollforward ties: PASS")
-8. `exceptions.csv`: anything that couldn't be priced, mapped, or explained. Alongside it:
+   - Four bridges per month: A. unit completeness, B. usage to invoice, C. usage to revenue (also agreed to the GL), D. revenue to cash (agreed to GL 1000).
+   - Written for an accountant who won't run the code: a one-sentence explanation above each bridge, and an "Unexplained difference" line in each, which must be zero.
+7. `close_checklist.md`: each revenue close step with a preparer, a reviewer, a due day, an automated pass/fail check (for example, "unbilled AR rollforward ties: PASS"), and a status, for each month
+   - A summary line at the top for each month, for example "March close: 11 of 12 steps complete, 1 outstanding."
+   - The Controller reviews every step, so preparer and reviewer always differ. The Controller's own sign-off is reviewed by the CFO.
+   - Preparers: Billing engineering; Finance Manager, Revenue Accounting; GL accountant; AR specialist; Controller (sign-off only).
+   - The sign-off is manual: the model never marks it complete.
+8. `exceptions.csv`: anything that couldn't be priced, mapped, or explained. Duplicates are logged here as "resolved" (excluded from billing by rule, section 3.2); the close requires no open exceptions. Alongside it:
    - `lag_report.csv`: usage received in the month but processed after the cutoff, by customer, with estimate vs actual
    - `passed_adjustments_log.csv`: unusual items recorded in the current month under the close threshold, with the running total (section 3.2)
 
@@ -298,7 +330,7 @@ At February 28, billed AR is Harry Hood's January invoice (paid March 2), and un
 
 | Control | What it proves |
 |---|---|
-| **Completeness** | Raw usage rows = priced + free + capped + duplicate rows. Nothing disappears silently. |
+| **Completeness** | Raw usage units received = free-tier + tiered (priced) + duplicate + late units, by customer, product, and month. Nothing disappears silently. Measured in units because one daily row usually holds both free and priced units; the billing limit is a dollar amount, so capped usage is shown in the dollar bridges instead. |
 | **Cutoff** | Every row is assigned to a period by `received_ts` (UTC). Usage processed after the cutoff is covered by the lag estimate, and estimate vs actual is tracked each month. |
 | **Close threshold** | Unusual items are measured in aggregate against the threshold, and every passed item is logged with a running total. |
 | **Pricing accuracy** | Invoice totals are independently recomputed from the rate card and agree. |

@@ -70,7 +70,7 @@ def build_aging(ledger, invoices, gl, as_of=AS_OF):
              {"line": "GL 1150 balance", "amount": gl_1150},
              {"line": "difference", "amount": sum(unbilled.values(), ZERO) - gl_1150}]
 
-    frame = pd.DataFrame(rows, columns=AGING_COLUMNS).fillna("")
+    frame = pd.DataFrame(rows, columns=AGING_COLUMNS).astype(object).fillna("")
     for column in ["amount"] + BUCKETS:
         frame[column] = frame[column].map(lambda a: f"{a:.2f}" if a != "" else "")
     return frame

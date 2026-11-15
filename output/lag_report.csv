@@ -1,0 +1,4 @@
+customer_id,usage_month,processed_usage_revenue,lag_rate,estimate,actual_late_usage,late_units,change_in_estimate,recognized_in
+HOOD,2026-01,3225.00,0.01,32.25,40.00,2000000,7.75,2026-02
+HOOD,2026-02,3225.00,0.01,32.25,0.00,0,-32.25,2026-03
+HOOD,2026-03,3225.00,0.01,32.25,pending,pending,,2026-04 (after period end)

@@ -1,0 +1,2 @@
+month,customer_id,product,ledger_ids,description,amount,month_unusual_items_total,month_total_revenue,threshold_pct,threshold,below_threshold,running_total
+2026-03,HOOD,event_analytics,BL-00045,"January usage, reprocessed after a system fix",50.00,50.00,17940.00,0.005,89.70,yes,50.00

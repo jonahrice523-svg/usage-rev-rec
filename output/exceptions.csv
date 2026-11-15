@@ -1,0 +1,3 @@
+exception_id,type,reference,customer_id,month,units,amount,status,resolution
+EXC-001,duplicate_usage,EVT-000103,HOOD,2026-01,988254,,resolved,Excluded from pricing and billing by rule (SPEC 3.2)
+EXC-002,duplicate_usage,EVT-000218,HOOD,2026-01,1122004,,resolved,Excluded from pricing and billing by rule (SPEC 3.2)
