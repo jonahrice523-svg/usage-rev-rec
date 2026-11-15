@@ -1,0 +1,4 @@
+contract_id,customer_id,contract_type,effective_from,effective_to,credit_value,cash_price
+CON-HOOD-001,HOOD,payg,2025-09-01,,,
+CON-MOCK-001,MOCK,credit,2026-01-01,2026-12-31,100000.00,80000.00
+CON-TELA-001,TELA,payg,2025-11-01,,,

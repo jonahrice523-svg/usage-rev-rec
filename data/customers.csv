@@ -1,0 +1,4 @@
+customer_id,name,plan_type,payment_terms,billing_limits
+HOOD,Harry Hood,payg,net_30,
+MOCK,Famous Mockingbird,credit,net_30,
+TELA,Tela,payg,net_15,session_replay:1000.00

@@ -72,6 +72,7 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
 - **HM-side lag (estimate, then true-up):**
   - Some usage received in a month isn't processed until after the close cutoff (business day 3), because of pipeline backlogs, failed metering jobs, or outage replays.
   - At close, HM accrues an estimate for it: the historical lag rate in `assumptions.csv` × the month's processed usage revenue, by customer. It's recorded as revenue and unbilled receivable. (Applying the lag rate to dollars rather than re-rating units through the tiers is a simplification, noted in the memo.)
+  - The estimate applies only to customers whose usage history shows post-cutoff lag. In this model, that is Harry Hood only.
   - When the usage is processed, it's billed on a true-up line on the next invoice. The difference between actual and estimate is recognized in the current month as a change in estimate, not an error correction (ASC 250).
 - **Unusual items and the close threshold:**
   - Items the estimate doesn't anticipate (for example, a bug fix that reprocesses a closed month) are measured in aggregate across all customers for the month, not item by item.
@@ -139,7 +140,7 @@ The GL export is ERP-agnostic. No real ERP's import format is assumed.
 | `customers.csv` | customer | `customer_id`, `name`, `plan_type`, `payment_terms`, `billing_limits` (dollars per product per month) |
 | `contracts.csv` | contract | `contract_id`, `customer_id`, `contract_type` (payg / credit), `effective_from`, `effective_to`, `credit_value`, `cash_price` |
 | `rate_cards.csv` | product × tier | `product`, `tier_floor`, `tier_ceiling`, `unit_price` |
-| `usage_events.csv` | daily aggregate per customer per product | `event_id`, `customer_id`, `product`, `quantity`, `client_ts`, `received_ts`, `processed_ts` |
+| `usage_events.csv` | daily aggregate per customer per product | `event_id`, `customer_id`, `product`, `quantity`, `client_ts`, `received_ts`, `processed_ts`, `source` (`normal` / `bug_fix_reprocess`) |
 | `payments.csv` | payment, **generated in build step 4** from rules once invoices exist (Harry Hood pays in full before the due date; Famous Mockingbird pays January 28; Tela as in 3.4). Invoice IDs follow a fixed pattern, e.g. `INV-2026-01-TELA`. | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
 | `prior_period_invoices.csv` | Tela's December 2025 invoice by product. Reference only, for the billing reply in 3.4; never recognized as revenue. | `customer_id`, `invoice_id`, `product`, `amount` |
 | `adjustments.csv` | credit memo | `adjustment_id`, `customer_id`, `invoice_id`, `amount`, `date`, `reason`, `classification` |
@@ -150,7 +151,7 @@ Keep the data small enough to inspect by eye: daily aggregates, with a few delib
 - one batch of 2,000,000 events received January 31 but processed February 6, after the cutoff (business day 3 is February 4). This is HM-side lag: January revenue via the estimate, true-up in February.
 - one batch with a January 31 `client_ts` received February 1 (customer-side delay: February usage, no true-up)
 - one event at 11pm Pacific on January 31, which is February 1 in UTC (time zone: February usage)
-- one unusual item: in March, a bug fix reprocesses $200 of Harry Hood's January usage. It's below the close threshold, so it's recorded in March and logged in `passed_adjustments_log.csv` (section 3.2). It must not change any expected result below.
+- one unusual item: in March, a bug fix reprocesses $50 of Harry Hood's January usage (2,500,000 events at January's tier 3 rate), marked `source = bug_fix_reprocess`. It's below the close threshold, so it's recorded in March and logged in `passed_adjustments_log.csv` (section 3.2). It doesn't change any January or February result below.
 
 ### Check scenarios: fixed inputs and expected results
 
@@ -161,16 +162,22 @@ The generator can randomize how usage is spread across days, but each customer's
 | Customer | Month | Events | Recordings | Flag requests |
 |---|---|---|---|---|
 | Harry Hood | Jan | 30,000,000 | 300,000 | 20,000,000 |
+| Harry Hood | Feb | 30,000,000 | 300,000 | 20,000,000 |
+| Harry Hood | Mar | 30,000,000 | 300,000 | 20,000,000 |
 | Famous Mockingbird | Jan | 300,000,000 | 1,000,000 | 50,000,000 |
 | Famous Mockingbird | Feb | 400,000,000 | 1,500,000 | 60,000,000 |
 | Famous Mockingbird | Mar | 350,000,000 | 1,200,000 | 55,000,000 |
 | Tela | Jan | 200,000,000 | 600,000 | 15,000,000 |
 | Tela | Feb | 120,000,000 | 400,000 | 12,000,000 |
+| Tela | Mar | 100,000,000 | 300,000 | 10,000,000 |
+
+Harry Hood's February totals include the customer-side delay batch and the time-zone event. They exclude the duplicates, the lag batch, and the bug-fix reprocess.
 
 **Also:**
 - Harry Hood's lag batch: 2,000,000 events received January 31, processed February 6.
+- No lag batch arrives for February or March.
 - Tela's session replay cap: $1,000 a month.
-- Historical lag rate: 1%.
+- Historical lag rate: 1%, applied to Harry Hood only (section 3.2).
 - Close threshold: 0.5% of the month's total revenue, measured in aggregate.
 - The free tier applies to every customer, including Famous Mockingbird, before usage is priced.
 
@@ -181,12 +188,16 @@ The generator can randomize how usage is spread across days, but each customer's
 | 1 | Harry Hood January usage at close (events $900 + replay $925 + flags $1,400) | $3,225.00 |
 | 1a | Lag estimate accrued January 31 (1% × $3,225) | $32.25 |
 | 1b | True-up line on the February invoice (2M events at January's tier 3 rate), and the change in estimate recognized in February ($40.00 − $32.25) | $40.00 and $7.75 |
+| 1c | Harry Hood February revenue ($3,225 usage + $32.25 February lag estimate + $7.75 true-up of January's estimate) | $3,265.00 |
+| 1d | Harry Hood March revenue ($3,225 usage + $32.25 March estimate − $32.25 reversal of February's estimate, since no February lag batch arrives, + $50 bug fix) | $3,275.00 |
 | 2 | Famous Mockingbird credit consumed in Q1 at list price ($11,525 + $15,025 + $13,175) | $39,725.00 |
 | 2a | Famous Mockingbird Q1 revenue (× 0.80) | $31,780.00 |
 | 2b | Contract liability at March 31 ($80,000 − $31,780, which also equals $60,275 of remaining credit × 0.80) | $48,220.00 |
 | 3 | Tela January invoice (events $4,300 + replay capped at $1,000 + flags $1,150; $525 capped) | $6,450.00 |
 | 3a | Tela February revenue (usage $4,700, with $125 capped, less the $1,500 concession) | $3,200.00 |
 | 3b | Tela January cash received (invoice less the credit memo) | $4,950.00 |
+| 3c | Tela March revenue (events $2,300 + replay $925, under the cap + flags $900) | $4,125.00 |
+| 4 | March total revenue (Famous Mockingbird $10,540 + Harry Hood $3,275 + Tela $4,125); 0.5% close threshold; the $50 bug fix falls below it | $17,940.00 and $89.70 |
 
 ---
 

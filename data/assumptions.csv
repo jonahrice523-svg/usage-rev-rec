@@ -1,0 +1,7 @@
+key,value,note
+close_cutoff_business_day,3,SPEC 3.2: close cutoff is business day 3
+lag_rate,0.01,"SPEC 3.2: historical lag rate, Harry Hood only"
+close_threshold_pct,0.005,"SPEC 3.2: % of the month's total revenue, in aggregate"
+breakage_pct,0,SPEC 3.3: expected breakage constrained to zero
+collections_reminder_days,5,SPEC 3.4: reminder at day 5 past due
+collections_followup_days,15,SPEC 3.4: follow-up at day 15 past due

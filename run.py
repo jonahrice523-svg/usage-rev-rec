@@ -1,11 +1,12 @@
 """Run the quarter's revenue close end to end.
 
-Step 1 (scaffolding): no accounting yet. This prints the build plan and
-makes sure the input and output folders exist. Each later step in
-SPEC.md section 8 adds its piece here.
+So far this generates the synthetic input data (step 2). Each later step
+in SPEC.md section 8 adds its piece here.
 """
 
 from pathlib import Path
+
+from revrec.generate_data import generate
 
 ROOT = Path(__file__).parent
 FOLDERS = ["data", "config", "output", "output/workpapers"]
@@ -23,7 +24,7 @@ BUILD_STEPS = [
     "9. Workpapers and the Tela billing reply",
     "10. run.py runs the whole quarter's close",
 ]
-STEPS_DONE = 1
+STEPS_DONE = 2
 
 
 def main():
@@ -34,6 +35,9 @@ def main():
     for folder in FOLDERS:
         (ROOT / folder).mkdir(parents=True, exist_ok=True)
     print("Folders ready: " + ", ".join(FOLDERS))
+
+    generate(ROOT / "data")  # step 2
+    print("Synthetic data written to data/: " + ", ".join(sorted(p.name for p in (ROOT / "data").glob("*.csv"))))
     print()
 
     print("Build progress (SPEC section 8):")
