@@ -32,7 +32,7 @@ POSITIONS = [
     "One standard approach for every contract: usage allocated to its month, prepaid credit recognized as "
     "consumed. The expedient gives the same answer for pay-as-you-go but can’t handle prepaid.",
     "Held at zero until HM has years of expiry history by segment; at Famous Mockingbird’s pace, its credit "
-    "runs out by August anyway.",
+    "runs out in August anyway.",
     "Usage belongs to the month HM receives it, because receiving and processing the data is the service; "
     "the customer terms must use the same clock.",
     "Estimate the routine processing lag every month; send unusual items over the threshold to a person, "

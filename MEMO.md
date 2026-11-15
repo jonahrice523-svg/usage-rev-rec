@@ -32,7 +32,7 @@ Full detail is in [SPEC.md](SPEC.md) section 3.
 
 **Billing limits.** Tela's $1,000 replay limit meant $525 of January usage was never billed. That doesn't weaken the argument. The limit is a price term the customer chose, value is measured at the contract price, not list, and the limit resets monthly, so no revenue shifts between periods. If capped usage became large or frequent, though, I'd watch it as a sign that billing was drifting from value delivered.
 
-**What would change my mind.** A contract book that was entirely simple pay-as-you-go with consistent per-unit pricing. There, the expedient makes revenue equal billing, cuts documentation, and allows some disclosure relief. I'd consider electing it for those contracts while keeping the standard approach for prepaid credit and anything with upfront fees, minimums, or ramps. The expedient would also matter for any service that isn't a series of similar periods, such as a consulting project building toward one deliverable. There, allocating fees to each month isn't available (RR 3.3.2), and the expedient can be the only simple route. HM's usage service is a series, so that case doesn't arise here.
+**What would change my mind.** A contract book that was entirely simple pay-as-you-go with consistent per-unit pricing. There, the expedient makes revenue equal billing, cuts documentation, and allows some disclosure relief. I'd consider electing it for those contracts while keeping the standard approach for prepaid credit and anything with upfront fees, minimums, or ramps. The expedient would also matter for any service that isn't a series of similar periods, such as a consulting project building toward one deliverable. There, allocating fees to each month isn't available (RR 3.3.2, RR 5.5.1.1), and the expedient can be the only simple route. HM's usage service is a series, so that case doesn't arise here.
 
 **From experience.** I've worked on the other side of this choice. At User Interviews, customers bought an allotment of credits and spent them on research studies, with different study types costing different numbers of credits. Projects were lumpy, and the package bundled access to the participant panel, project coordination, and ongoing customer success, so we treated it as a stand-ready bundle and recognized revenue straight-line. As we planned the move to usage-based pricing, billing was going to follow the credits consumed each month. That meant mapping every project type to its credit cost and getting that usage data from the website, through the data warehouse, into Chargebee so monthly billing could run automatically. Once billing follows consumption, the recognition question changes with it, and that shift is what this model works through.
 
@@ -95,7 +95,7 @@ Full detail is in [SPEC.md](SPEC.md) section 3.
 
 - **Billing engineering** owns the pipeline: ingestion completeness, removing duplicates, rate card configuration, and the IT controls around them.
 - **Finance** owns the account mapping, the reconciliations and their review, journal entries, the lag estimate, and the credit memo approval policy.
-- **Shared:** the reconciliation from usage to invoices.
+- **Shared:** the reconciliation from usage to invoices (the model's controls matrix assigns it to revenue accounting).
 
 The [controls matrix](output/workpapers/controls_matrix.md) lists each control's owner and reviewer. Every control passes in all three months.
 
