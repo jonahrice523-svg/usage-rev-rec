@@ -31,6 +31,8 @@ A small, end-to-end model of one quarter of revenue accounting for a fictional u
 - Credit is sold at a **20% discount**: $100,000 of credit costs $80,000. It's invoiced upfront, Net 30, and noncancellable, with a 12-month term.
 - Usage draws down credit at standard list prices on any product, after the same monthly free tier every customer gets.
 - Unused credit expires at term end.
+- If prepaid credit runs out before term end, further usage is billed monthly in arrears at standard pay-as-you-go rates until a new term starts.
+  - *Note:* at its Q1 pace (about $13,240 of credit a month, $39,725 for the quarter), Famous Mockingbird exhausts its credit around mid-August 2026, outside the model period. The model doesn't reach this case.
 
 **Model period:** January–March 2026 (three monthly closes). The fiscal year starts January 1.
 
@@ -408,4 +410,6 @@ These were considered and parked so v1 stays focused:
 - **Startup promotional credit:** credit applied against amounts owed reduces the transaction price (RR 4.6)
 - **Credit top-ups:** a separate contract at standalone selling price (RR 2.9.2, Example RR 2-15)
 - **Rollover of unused credit on renewal:** a possible material right (RR 7.3, Example RR 7-11)
+- **Credit exhaustion and overage billing:** usage after prepaid credit runs out, billed monthly in arrears at pay-as-you-go rates (section 1)
+- **Preventive controls:** rate card change approval, account mapping change approval, and credit memo approval limits. The v1 controls (section 7) are all detective.
 - **Also out of scope:** taxes, multi-currency, commissions (ASC 340-40), disclosures, and any ERP-specific import format
