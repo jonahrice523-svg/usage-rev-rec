@@ -178,15 +178,66 @@ def test_judgment_cards_come_from_memo(page):
         assert " ".join(first.split())[:80] in text
 
 
-def test_from_experience_paragraphs_stay_off_the_page(page):
-    """They name real companies, and the page uses no real company names."""
+def test_every_memo_paragraph_is_in_its_card(page):
+    """Each card's expanded text holds the whole MEMO.md section, "From experience" included."""
     memo = (ROOT / "MEMO.md").read_text(encoding="utf-8")
     experience = re.findall(r"^\*\*From experience\.\*\*(.+)$", memo, flags=re.M)
-    assert experience  # the memo has them
-    text = " ".join(visible_text(page, drop_memo=False).split())
-    assert "From experience" not in text
-    for paragraph in experience:
-        assert " ".join(paragraph.split())[:60] not in text
+    assert experience  # the memo has them, and they're checked with every other paragraph below
+    cards = re.findall(r'<article class="card judgment">(.*?)</article>', page, re.S)
+    for _, blocks in memo_sections(memo):
+        for block in blocks:
+            plain = re.sub(r"\*\*|\*|\[([^\]]+)\]\([^)]+\)", r"\1", re.sub(r"^- ", "", block, flags=re.M))
+            assert any(" ".join(plain.split())[:60] in " ".join(visible_text(c, drop_memo=False).split())
+                       for c in cards), block[:60]
+
+
+def test_memo_figures_match_the_model(quarter):
+    """Every $ and % figure in MEMO.md (shown in the cards) recomputed from the model.
+
+    If the memo gains a new figure, this test fails until the figure is added here with its source.
+    """
+    import pandas as pd
+    out = quarter["root"] / "output"
+    lag = pd.read_csv(out / "lag_report.csv", dtype=str).set_index("usage_month")
+    passed = quarter["close"]["passed_log"].iloc[0]
+    f = quarter["site"]["facts"]
+    terms, tela, by_month = f["credit_terms"], f["tela"], f["revenue_by_month"]
+    drawdown = sum(D(a) for a in quarter["ledger"][quarter["ledger"].event_type == "credit_drawdown"].amount)
+
+    def dollars(x, places=2):
+        x = D(x).quantize(D(1) / 10 ** places) if places else D(x).quantize(D(1))
+        return f"${x:,}"
+
+    def pct(x, places):
+        return f"{(D(x) * 100).quantize(D(1) / 10 ** places) if places else (D(x) * 100).quantize(D(1))}%"
+
+    expected = {
+        "$80,000": dollars(terms["cash_price"], 0),                       # SPEC 3.3
+        "$100,000": dollars(terms["credit_value"], 0),
+        "$0.80": dollars(terms["per_dollar"]),
+        "$1.00": dollars(terms["dollar"]),
+        "20%": pct(1 - terms["per_dollar"], 0),
+        "$1,000": dollars(f["tiers"]["billed"], 0),                       # Tela's replay limit, SPEC 3.4
+        "$525": dollars(-tela["billing_limit"], 0),
+        "$1,500": dollars(-tela["concession"], 0),
+        "23%": pct(-tela["concession"] / tela["invoiced"], 0),
+        "2.7%": pct(-tela["concession"] / f["q1_revenue"], 1),
+        "$13,240": dollars((drawdown / 3 / 10).quantize(D(1)) * 10, 0),   # "about": Q1 pace, nearest $10
+        "1%": pct(lag.loc["2026-01", "lag_rate"], 0),                     # SPEC 3.2
+        "$32.25": dollars(lag.loc["2026-01", "estimate"]),
+        "$40": dollars(lag.loc["2026-01", "actual_late_usage"], 0),
+        "1.24%": pct(D(lag.loc["2026-01", "actual_late_usage"]) / D(lag.loc["2026-01", "processed_usage_revenue"]), 2),
+        "$0": dollars(lag.loc["2026-02", "actual_late_usage"], 0),
+        "$7.75": dollars(lag.loc["2026-01", "change_in_estimate"]),
+        "0.5%": pct(passed.threshold_pct, 1),
+        "$50": dollars(passed.amount, 0),
+        "0.26%": pct(D(passed.amount) / by_month["2026-01"], 2),
+        "0.28%": pct(D(passed.amount) / by_month["2026-03"], 2),
+    }
+    memo = (ROOT / "MEMO.md").read_text(encoding="utf-8")
+    found = set(re.findall(r"\$[\d,]+(?:\.\d+)?|\b\d+(?:\.\d+)?%", memo))
+    assert found == set(expected), "new or removed figure in MEMO.md"
+    assert {k: v for k, v in expected.items() if k != v} == {}
 
 
 def test_links_point_to_the_repo(page):

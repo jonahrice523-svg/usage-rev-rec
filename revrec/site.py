@@ -43,6 +43,12 @@ POSITIONS = [
     "Neither wins automatically: fix the difference where it started and re-sync; never plug the GL.",
 ]
 
+# Where a card's policy goes further than the model, say what the model actually does.
+MODEL_NOTES = {
+    4: "In the model: unusual items are tested against the current month's revenue only (SPEC 3.2). "
+       "Checking both months is the policy I'd adopt.",
+}
+
 
 def money(amount, sign=False):
     """$1,234.56, with a minus sign for negatives (or a plus sign if asked)."""
@@ -165,18 +171,13 @@ def blocks_to_html(blocks):
 
 
 def memo_sections(memo_text):
-    """The seven judgment call sections of MEMO.md, as (title, blocks).
-
-    "From experience" paragraphs stay in MEMO.md only: they name real companies, and the page
-    uses no real company names.
-    """
+    """The seven judgment call sections of MEMO.md, as (title, blocks), every paragraph included."""
     sections = re.split(r"^### ", memo_text, flags=re.M)[1:]
     out = []
     for section in sections:
         heading, _, body = section.partition("\n")
         body = re.split(r"^## ", body, flags=re.M)[0]
         blocks = [b.strip() for b in re.split(r"\n\s*\n", body) if b.strip()]
-        blocks = [b for b in blocks if not b.startswith("**From experience.**")]
         out.append((re.sub(r"^\d+\.\s*", "", heading.strip()), blocks))
     return out
 
@@ -399,13 +400,15 @@ def section_judgment(sections):
     for number, ((title, blocks), position) in enumerate(zip(sections, POSITIONS), start=1):
         more = (f"<details><summary>Read the reasoning</summary>{blocks_to_html(blocks)}</details>" if blocks
                 else '<p class="muted small">Full reasoning in MEMO.md (in progress).</p>')
+        note = f'<p class="model-note">{esc(MODEL_NOTES[number])}</p>' if number in MODEL_NOTES else ""
         cards.append(f'<article class="card judgment"><p class="num-badge">{number}</p><h3>{esc(title)}</h3>'
-                     f'<p class="position">{esc(position)}</p>{more}</article>')
+                     f'<p class="position">{esc(position)}</p>{note}{more}</article>')
     return f"""
 <section id="judgment">
   <p class="eyebrow">5 · Seven judgment calls</p>
   <h2>The parts a spreadsheet can't decide</h2>
-  <p>The model applies the policies. These are the calls behind them, from my policy memo.</p>
+  <p>Where I landed on each open question, from my policy memo. Some positions go further than the
+  model does; where they do, the card says so.</p>
   <div class="cards two">{"".join(cards)}</div>
   <p class="small"><a href="{REPO}/blob/main/MEMO.md">Read the full memo, MEMO.md →</a></p>
 </section>"""
@@ -598,6 +601,7 @@ padding:8px 0;border-bottom:1px solid var(--line)}
 .judgment{position:relative;padding-top:18px}
 .num-badge{font-weight:700;color:var(--muted);margin:0 0 4px}
 .position{font-size:1.05rem;font-weight:500}
+.model-note{font-size:.88rem;color:var(--ink-2);border-left:3px solid var(--axis);padding-left:10px}
 .judgment details p,.judgment details li{color:var(--ink-2);font-size:.95rem}
 .judgment ul{padding-left:1.2em}
 .month .big{font-size:1.8rem;font-weight:700;margin:0}
