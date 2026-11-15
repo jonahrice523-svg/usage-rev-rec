@@ -1,10 +1,10 @@
 invoice_id,customer_id,issue_date,due_date,usage_month,line_no,line_type,product,tier,units,unit_price,amount,description
-INV-2025-12-HOOD,HOOD,2026-01-02,2026-02-01,2025-12,1,prior_period_usage,event_analytics,,,,850.00,December 2025 usage
-INV-2025-12-HOOD,HOOD,2026-01-02,2026-02-01,2025-12,2,prior_period_usage,session_replay,,,,900.00,December 2025 usage
-INV-2025-12-HOOD,HOOD,2026-01-02,2026-02-01,2025-12,3,prior_period_usage,feature_flags,,,,1350.00,December 2025 usage
-INV-2025-12-TELA,TELA,2026-01-02,2026-01-17,2025-12,1,prior_period_usage,event_analytics,,,,2100.00,December 2025 usage
-INV-2025-12-TELA,TELA,2026-01-02,2026-01-17,2025-12,2,prior_period_usage,session_replay,,,,900.00,December 2025 usage
-INV-2025-12-TELA,TELA,2026-01-02,2026-01-17,2025-12,3,prior_period_usage,feature_flags,,,,800.00,December 2025 usage
+INV-2025-12-HOOD,HOOD,2026-01-02,2026-02-01,2025-12,1,prior_period_usage,event_analytics,,27500000,,850.00,December 2025 usage
+INV-2025-12-HOOD,HOOD,2026-01-02,2026-02-01,2025-12,2,prior_period_usage,session_replay,,287500,,900.00,December 2025 usage
+INV-2025-12-HOOD,HOOD,2026-01-02,2026-02-01,2025-12,3,prior_period_usage,feature_flags,,19000000,,1350.00,December 2025 usage
+INV-2025-12-TELA,TELA,2026-01-02,2026-01-17,2025-12,1,prior_period_usage,event_analytics,,90000000,,2100.00,December 2025 usage
+INV-2025-12-TELA,TELA,2026-01-02,2026-01-17,2025-12,2,prior_period_usage,session_replay,,287500,,900.00,December 2025 usage
+INV-2025-12-TELA,TELA,2026-01-02,2026-01-17,2025-12,3,prior_period_usage,feature_flags,,9000000,,800.00,December 2025 usage
 INV-2026-01-MOCK,MOCK,2026-01-01,2026-01-31,,1,credit_purchase,,,,,80000.00,"Annual prepaid credit: $100,000.00 of usage credit, 2026-01-01 to 2026-12-31"
 INV-2026-01-HOOD,HOOD,2026-02-03,2026-03-05,2026-01,1,usage,event_analytics,free,1000000,0,0.00,"Free tier, January usage"
 INV-2026-01-HOOD,HOOD,2026-02-03,2026-03-05,2026-01,2,usage,event_analytics,1,4000000,0.00005,200.00,"Tier 1, January usage"

@@ -215,6 +215,19 @@ def test_opening_balances(data_dir):
     assert Decimal(unbilled.loc["TELA", "debit"]) == Decimal("3800.00")
 
 
+def test_december_quantities_price_to_december_amounts(data_dir):
+    # SPEC 5: each December quantity prices exactly to its invoice amount under the rate card.
+    from revrec.pricing import load_billing_limits, load_rate_card, price
+    rate_card = load_rate_card(data_dir / "rate_cards.csv")
+    limits = load_billing_limits(data_dir / "customers.csv")
+    december = read(data_dir, "prior_period_invoices.csv")
+    for row in december.itertuples():
+        cap = limits[row.customer_id].get(row.product)
+        assert price(row.product, int(row.quantity), rate_card, cap).billed_amount == Decimal(row.amount), row
+    tela_events = december[(december.customer_id == "TELA") & (december["product"] == "event_analytics")]
+    assert int(tela_events.quantity.iloc[0]) == 90_000_000  # January's 200M is more than double
+
+
 def test_january_business_day_2():
     # SPEC 1: December invoices are issued on business day 2 of January.
     assert business_day(2026, 1, 2) == date(2026, 1, 2)

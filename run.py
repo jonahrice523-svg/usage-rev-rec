@@ -7,6 +7,8 @@
 from pathlib import Path
 
 from revrec.billing import invoice_totals, load_inputs, read_text_csv, run_billing
+from revrec.billing_reply import run_billing_reply
+from revrec.workpapers import run_workpapers
 from revrec.close import run_close
 from revrec.collections import run_collections
 from revrec.generate_data import generate
@@ -34,11 +36,11 @@ BUILD_STEPS = [
     "9. Workpapers and the Tela billing reply",
     "10. run.py runs the whole quarter's close",
 ]
-STEPS_DONE = 8
+STEPS_DONE = 9
 
 
 def close_quarter():
-    """Run steps 2-8 and return everything each step produced."""
+    """Run steps 2-9 and return everything each step produced."""
     for folder in FOLDERS:
         (ROOT / folder).mkdir(parents=True, exist_ok=True)
     r = {}
@@ -63,6 +65,12 @@ def close_quarter():
                            reconciliation=r["reconciliation"],
                            reminder_days=int(days["collections_reminder_days"]),
                            followup_days=int(days["collections_followup_days"]))
+    r["reply_text"], r["reply"] = run_billing_reply(OUTPUT, r["lines"], inputs.limits)        # step 9
+    r["workpapers"] = run_workpapers(
+        OUTPUT, checklist=r["close"]["checklist"], integration_controls=r["controls"],
+        raw_usage=load_usage(DATA / "usage_events.csv"), usage_summary=inputs.usage, ledger=r["ledger"],
+        lines=r["lines"], invoices=r["invoices"], gl=r["gl"], mapping=read_text_csv(CONFIG / "account_mapping.csv"),
+        adjustments=inputs.adjustments, cutoff_day=inputs.cutoff_business_day)
     return r
 
 
@@ -154,12 +162,28 @@ def print_close(r):
     print()
 
 
+def print_workpapers(r):
+    reply = r["reply"]
+    print("Step 9. Tela billing reply (output/billing_reply_tela.md): "
+          f"December {reply['dec_total']:,.2f} -> January {reply['jan_total']:,.2f}")
+    results = r["workpapers"]["control_results"]
+    print("  Controls matrix (output/workpapers/controls_matrix.md):")
+    for control in results[MONTHS[0]]:
+        print(f"    {control:<18}" + "  ".join("PASS" if results[m][control] else "FAIL" for m in MONTHS))
+    print("  Sample tie-outs (output/workpapers/sample_tieouts.md):")
+    for invoice_id, checks in r["workpapers"]["tieout_checks"].items():
+        tied = all(passed for _, passed, _ in checks)
+        print(f"    {invoice_id:<18} {'ties' if tied else 'DOES NOT TIE'} ({len(checks)} checks)")
+    print()
+
+
 def main():
     print("Hedgehog Metrics, Inc. - usage revenue model (synthetic data)")
     print("Model period: January-March 2026")  # SPEC 1
     print()
     r = close_quarter()
-    for section in [print_pricing, print_billing, print_revenue, print_gl, print_rollforwards, print_close]:
+    for section in [print_pricing, print_billing, print_revenue, print_gl, print_rollforwards, print_close,
+                    print_workpapers]:
         section(r)
     print("Build progress (SPEC section 8):")
     for number, step in enumerate(BUILD_STEPS, start=1):

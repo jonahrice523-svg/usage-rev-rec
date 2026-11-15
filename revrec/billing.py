@@ -120,7 +120,7 @@ def build_invoices(inputs):
     # SPEC 5: December 2025 invoices, issued January 2 (business day 2).
     for invoice_id, rows in inputs.prior_invoices.groupby("invoice_id", sort=True):
         add_invoice(invoice_id, rows.customer_id.iloc[0], business_day(2026, 1, 2), "2025-12",
-                    [line("prior_period_usage", r.amount, "December 2025 usage", product=r.product)
+                    [line("prior_period_usage", r.amount, "December 2025 usage", product=r.product, units=int(r.quantity))
                      for r in rows.itertuples()])
 
     # SPEC 3.3: annual prepaid credit, invoiced upfront on January 1.

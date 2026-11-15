@@ -170,15 +170,17 @@ def generate(data_dir):
                 "January event volume included a misconfigured test environment", "price_concession"]])
 
     # SPEC 5: December 2025 invoices, issued January 2 from the opening unbilled AR.
-    # December usage is never recognized as revenue in the model period.
+    # December usage is never recognized as revenue in the model period. Quantities are
+    # chosen so each prices exactly to its amount under the rate card (Tela's replay is
+    # under its $1,000 limit).
     write_csv(data_dir / "prior_period_invoices.csv",
-              ["customer_id", "invoice_id", "product", "amount"],
-              [[HOOD, "INV-2025-12-HOOD", EVENTS, "850.00"],
-               [HOOD, "INV-2025-12-HOOD", REPLAY, "900.00"],
-               [HOOD, "INV-2025-12-HOOD", FLAGS, "1350.00"],
-               [TELA, "INV-2025-12-TELA", EVENTS, "2100.00"],
-               [TELA, "INV-2025-12-TELA", REPLAY, "900.00"],
-               [TELA, "INV-2025-12-TELA", FLAGS, "800.00"]])
+              ["customer_id", "invoice_id", "product", "quantity", "amount"],
+              [[HOOD, "INV-2025-12-HOOD", EVENTS, 27_500_000, "850.00"],
+               [HOOD, "INV-2025-12-HOOD", REPLAY, 287_500, "900.00"],
+               [HOOD, "INV-2025-12-HOOD", FLAGS, 19_000_000, "1350.00"],
+               [TELA, "INV-2025-12-TELA", EVENTS, 90_000_000, "2100.00"],
+               [TELA, "INV-2025-12-TELA", REPLAY, 287_500, "900.00"],
+               [TELA, "INV-2025-12-TELA", FLAGS, 9_000_000, "800.00"]])
 
     # SPEC 5: opening balances at January 1, 2026. Unbilled AR for December usage, offset to
     # retained earnings: December usage was 2025 revenue, already closed. No other opening balances.

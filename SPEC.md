@@ -105,6 +105,8 @@ Each policy states the treatment, the reasoning, and the guide reference. **Thes
   - **On the invoice:** replay tier lines are shown at list, followed by a separate "Monthly billing limit ($1,000.00)" line for the capped amount. This line is presentation only. It never posts to revenue, contra-revenue, or a credit memo.
   - *In practice*, products with billing limits often stop processing data once the cap is hit. The model lets the usage arrive and prices it so the cap is visible.
 - **The billing question:** In early February, Tela's finance team asks why January's invoice is higher than December's. The answer comes from the model's per-customer usage-to-invoice trace. The repo includes the reply as `output/billing_reply_tela.md`, written in plain language for a customer.
+  - The reply is dated February 5, before the dispute. It compares December and January units and dollars by product: the main driver is that event volume more than doubled (90M to 200M). It points out the January event spike, suggests Tela check whether a new environment or project began sending events, and suggests a billing limit on events. It promises no credit.
+  - This reply is what led Tela to find the misconfigured test environment and raise the dispute below, which HM resolved with the February 10 credit memo.
 - **The dispute:** Tela says some January event volume came from a misconfigured test environment and asks for relief. HM issues a **$1,500 credit memo** in February.
   - **Classification:** This is a **price concession**, not a credit loss. It's an adjustment outside the original contract terms, given because of customer dissatisfaction, not because Tela can't pay (RR 4.3.3.1).
   - **Timing:** January's service is already delivered, so the change in transaction price reduces revenue in **February**, the period the price changes (ASC 606-10-32-43; RR 5.5.2). It's recorded as contra-revenue and tagged to event analytics in the revenue schedule, since the dispute concerned event volume.
@@ -155,7 +157,7 @@ The GL export is ERP-agnostic. No real ERP's import format is assumed.
 | `rate_cards.csv` | product × tier | `product`, `tier_floor`, `tier_ceiling`, `unit_price` |
 | `usage_events.csv` | daily aggregate per customer per product | `event_id`, `customer_id`, `product`, `quantity`, `client_ts`, `received_ts`, `processed_ts`, `source` (`normal` / `bug_fix_reprocess`) |
 | `payments.csv` | payment, **generated in build step 4** from rules once invoices exist (Harry Hood pays in full 3 days before the due date, or the weekday before if that falls on a weekend; Famous Mockingbird pays January 28; Tela as in 3.4, and pays its December invoice by the same 3-day rule; invoices issued after March 31 have no payments). Invoice IDs follow a fixed pattern, e.g. `INV-2026-01-TELA`. | `payment_id`, `customer_id`, `invoice_id`, `amount`, `received_date` |
-| `prior_period_invoices.csv` | December 2025 invoices for Harry Hood and Tela, by product. They're issued January 2 from the opening unbilled AR. Tela's also supports the billing reply in 3.4. December usage is never recognized as revenue in the model period. | `customer_id`, `invoice_id`, `product`, `amount` |
+| `prior_period_invoices.csv` | December 2025 invoices for Harry Hood and Tela, by product. They're issued January 2 from the opening unbilled AR. Tela's also supports the billing reply in 3.4. December usage is never recognized as revenue in the model period. Each quantity prices exactly to its amount under the rate card (Tela: 90M events $2,100; 287,500 recordings $900; 9M flag requests $800. Harry Hood: 27.5M events $850; 287,500 recordings $900; 19M flag requests $1,350). | `customer_id`, `invoice_id`, `product`, `quantity`, `amount` |
 | `opening_balances.csv` | balance at January 1, 2026 | `as_of`, `account`, `customer_id`, `debit`, `credit`, `note` |
 | `adjustments.csv` | credit memo | `adjustment_id`, `customer_id`, `invoice_id`, `product`, `amount`, `date`, `reason`, `classification` |
 | `assumptions.csv` | assumption | `key`, `value`, `note` (close cutoff day, historical lag rate, close threshold as % of the month's revenue, breakage %, collections reminder days) |
@@ -355,7 +357,8 @@ At February 28, billed AR is Harry Hood's January invoice (paid March 2), and un
 10. `run.py`: one command runs the whole quarter's close end to end
 11. `MEMO.md`: the policy memo, written by Jonah in his own words
 
-**MVP for the application:** steps 1–8, 10, and 11, plus two pieces of step 9: the Tela billing reply and the controls matrix. The rest of the workpaper pack (lead sheet, tickmarked rollforward, sample tie-outs) comes after submission.
+**MVP for the application:** steps 1–8, 10, and 11, plus three pieces of step 9: the Tela billing reply, the controls matrix, and the sample tie-outs. The rest of the workpaper pack (lead sheet, tickmarked rollforward) comes after submission.
+- **Sample tie-outs** (`output/workpapers/sample_tieouts.md`): five invoices, at least one per customer, including Tela's January invoice with the credit memo and Famous Mockingbird's credit invoice, each traced from usage rows → billing ledger → invoice → GL → cash through the `ledger_id` trail.
 
 **Acceptance tests that must pass:**
 - Every journal entry balances.
