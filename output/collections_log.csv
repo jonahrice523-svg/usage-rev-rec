@@ -1,0 +1,3 @@
+invoice_id,customer_id,due_date,action,action_date,days_past_due,open_amount,status
+INV-2026-02-TELA,TELA,2026-03-18,reminder,2026-03-23,5,4700.00,sent
+INV-2026-02-TELA,TELA,2026-03-18,follow_up,2026-04-02,15,4700.00,scheduled (after period end)

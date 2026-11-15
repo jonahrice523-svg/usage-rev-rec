@@ -244,6 +244,17 @@ Harry Hood's February totals include the customer-side delay batch and the time-
 
 Net revenue (4000 + 4010 + 4100 − 4900) is $55,352.25, which equals check 6a.
 
+**Check 8: rollforward month-end balances**
+
+| Rollforward | January 31 | February 28 | March 31 |
+|---|---|---|---|
+| Contract liability: opening + invoiced − recognized | 0 + 80,000 − 9,220 = 70,780.00 | − 12,020 = 58,760.00 | − 10,540 = 48,220.00 |
+| Credit balance at list: opening + purchased − consumed | 0 + 100,000 − 11,525 = 88,475.00 | − 15,025 = 73,450.00 | − 13,175 = 60,275.00 |
+| Billed AR: opening + billed − cash − credits | 0 + 86,900 − 86,900 − 0 = 0.00 | + 9,675 − 4,950 − 1,500 = 3,225.00 | + 7,965 − 6,490 − 0 = 4,700.00 |
+| Unbilled AR: opening + accrued − invoiced | 6,900 + 9,707.25 − 6,900 = 9,707.25 | + 7,965.00 − 9,675 = 7,997.25 | + 7,400.00 − 7,965 = 7,432.25 |
+
+At February 28, billed AR is Harry Hood's January invoice (paid March 2), and unbilled AR is Harry Hood's $3,225 + $40 true-up + $32.25 estimate, plus Tela's $4,700. At March 31, the AR aging shows one open invoice: Tela's February invoice, $4,700, 13 days past due, in the 1–30 bucket.
+
 ---
 
 ## 6. Outputs (in `output/`)
@@ -254,12 +265,17 @@ Net revenue (4000 + 4010 + 4100 − 4900) is $55,352.25, which equals check 6a.
 3. `billing_ledger.csv` and `gl_export.csv` (section 4)
 
 **Balance sheet**
-4. `rollforwards.csv`:
-   - Contract liability: opening + invoiced − recognized = closing
-   - Credit balance at list value: opening + purchased − consumed = closing
-   - AR, billed and unbilled: opening + billed − cash − credits = closing
-   - Opening balances come from `opening_balances.csv` (section 5)
-5. `ar_aging.csv` and `collections_log.csv`
+4. `rollforwards.csv`, monthly, each tied to the GL at month end:
+   - Contract liability: opening + invoiced − recognized = closing (GL 2400)
+   - Credit balance at list value: opening + purchased − consumed = closing (memo; × 0.80 ties to GL 2400)
+   - Billed AR: opening + billed − cash − credits = closing (GL 1100)
+   - Unbilled AR: opening + accrued − invoiced = closing (GL 1150). Accrued is usage rated, late usage, and the lag estimate less its reversal.
+   - Opening balances come from `opening_balances.csv` (section 5). They're January's opening line, not a movement.
+   - AR rollforwards are by customer plus a total; the contract liability and credit balance are for Famous Mockingbird.
+   - The file is one long table (rollforward, customer, month, line, amount) that reads top to bottom like a workpaper.
+5. `ar_aging.csv` and `collections_log.csv`, as of March 31:
+   - The aging covers billed AR only, by open invoice, in buckets: current, 1–30, 31–60, 61–90, over 90 days past due. It ties to GL 1100. Unbilled AR isn't due yet, so it isn't aged; it's shown as a memo line that ties to GL 1150.
+   - The collections log applies the reminder and follow-up days in `assumptions.csv` to every invoice still open on those days. Actions after March 31 show as scheduled.
 
 **Reconciliation and close**
 6. `reconciliation.md`: usage → invoice → revenue → cash per month, with every difference explained by a named reconciling item (free tier, capped, duplicate, lag estimate and true-up, credit drawdown, credit discount, concession, timing of cash)

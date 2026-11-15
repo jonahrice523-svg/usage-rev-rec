@@ -7,10 +7,14 @@ adds its piece here.
 
 from pathlib import Path
 
+import pandas as pd
+
 from revrec.billing import ar_balances, invoice_totals, run_billing
 from revrec.generate_data import generate
 from revrec.pricing import load_billing_limits, load_rate_card, price_monthly_usage
+from revrec.collections import run_collections
 from revrec.gl import account_balances, run_gl
+from revrec.rollforwards import MONTHS, closing, run_rollforwards
 from revrec.revenue import revenue_by, run_revenue
 from revrec.usage import load_usage, summarize
 
@@ -30,7 +34,28 @@ BUILD_STEPS = [
     "9. Workpapers and the Tela billing reply",
     "10. run.py runs the whole quarter's close",
 ]
-STEPS_DONE = 6
+STEPS_DONE = 7
+
+
+def print_rollforward_summary(data, output, ledger, gl, invoices):
+    """Step 7: rollforwards tied to the GL, AR aging, and collections log."""
+    rf = run_rollforwards(data, output, ledger, gl)
+    aging, log = run_collections(data, output, ledger, invoices, gl)
+    print("Rollforward closing balances (output/rollforwards.csv):")
+    print(f"  {'Rollforward':<28}" + "".join(f"{m:>12}" for m in MONTHS))
+    for name, customer in [("contract_liability", "MOCK"), ("credit_balance_at_list", "MOCK"),
+                           ("billed_ar", "ALL"), ("unbilled_ar", "ALL")]:
+        print(f"  {name:<28}" + "".join(f"{closing(rf, name, customer, m):>12,.2f}" for m in MONTHS))
+    untied = rf[(rf.line == "difference") & (rf.amount != "0.00")]
+    print(f"  Ties to the GL: {'PASS' if untied.empty else 'FAIL'} ({len(rf[rf.line == 'difference'])} checks)")
+    print("AR aging at March 31 (output/ar_aging.csv):")
+    for row in aging[aging.line == "open_invoice"].itertuples():
+        print(f"  {row.invoice_id}  due {row.due_date}  {row.days_past_due} days past due  "
+              f"bucket {row.bucket}  {float(row.amount):,.2f}")
+    print("Collections log (output/collections_log.csv):")
+    for row in log.itertuples():
+        print(f"  {row.invoice_id}  {row.action:<10} {row.action_date}  {row.status}")
+    print()
 
 
 def print_gl_summary(config, data, output, ledger):
@@ -50,6 +75,7 @@ def print_gl_summary(config, data, output, ledger):
     for name, passed, detail in controls:
         print(f"  {'PASS' if passed else 'FAIL'}  {name} ({detail})")
     print()
+    return gl
 
 
 def print_revenue_summary(data, output, billing_ledger):
@@ -122,7 +148,9 @@ def main():
     print_pricing_summary(ROOT / "data")  # step 3
     billing_ledger = print_billing_summary(ROOT / "data", ROOT / "output")  # step 4
     ledger = print_revenue_summary(ROOT / "data", ROOT / "output", billing_ledger)  # step 5
-    print_gl_summary(ROOT / "config", ROOT / "data", ROOT / "output", ledger)  # step 6
+    gl = print_gl_summary(ROOT / "config", ROOT / "data", ROOT / "output", ledger)  # step 6
+    invoices = invoice_totals(pd.read_csv(ROOT / "output" / "invoices.csv", dtype=str, keep_default_na=False))
+    print_rollforward_summary(ROOT / "data", ROOT / "output", ledger, gl, invoices)  # step 7
 
     print("Build progress (SPEC section 8):")
     for number, step in enumerate(BUILD_STEPS, start=1):

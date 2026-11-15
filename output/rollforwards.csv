@@ -1,0 +1,196 @@
+rollforward,customer_id,month,line,amount
+contract_liability,MOCK,2026-01,opening,0.00
+contract_liability,MOCK,2026-01,invoiced,80000.00
+contract_liability,MOCK,2026-01,recognized,-9220.00
+contract_liability,MOCK,2026-01,closing,70780.00
+contract_liability,MOCK,2026-01,GL 2400 balance,70780.00
+contract_liability,MOCK,2026-01,difference,0.00
+contract_liability,MOCK,2026-02,opening,70780.00
+contract_liability,MOCK,2026-02,invoiced,0.00
+contract_liability,MOCK,2026-02,recognized,-12020.00
+contract_liability,MOCK,2026-02,closing,58760.00
+contract_liability,MOCK,2026-02,GL 2400 balance,58760.00
+contract_liability,MOCK,2026-02,difference,0.00
+contract_liability,MOCK,2026-03,opening,58760.00
+contract_liability,MOCK,2026-03,invoiced,0.00
+contract_liability,MOCK,2026-03,recognized,-10540.00
+contract_liability,MOCK,2026-03,closing,48220.00
+contract_liability,MOCK,2026-03,GL 2400 balance,48220.00
+contract_liability,MOCK,2026-03,difference,0.00
+credit_balance_at_list,MOCK,2026-01,opening,0.00
+credit_balance_at_list,MOCK,2026-01,purchased,100000.00
+credit_balance_at_list,MOCK,2026-01,consumed,-11525.00
+credit_balance_at_list,MOCK,2026-01,closing,88475.00
+credit_balance_at_list,MOCK,2026-01,closing x 0.80,70780.00
+credit_balance_at_list,MOCK,2026-01,GL 2400 balance,70780.00
+credit_balance_at_list,MOCK,2026-01,difference,0.00
+credit_balance_at_list,MOCK,2026-02,opening,88475.00
+credit_balance_at_list,MOCK,2026-02,purchased,0.00
+credit_balance_at_list,MOCK,2026-02,consumed,-15025.00
+credit_balance_at_list,MOCK,2026-02,closing,73450.00
+credit_balance_at_list,MOCK,2026-02,closing x 0.80,58760.00
+credit_balance_at_list,MOCK,2026-02,GL 2400 balance,58760.00
+credit_balance_at_list,MOCK,2026-02,difference,0.00
+credit_balance_at_list,MOCK,2026-03,opening,73450.00
+credit_balance_at_list,MOCK,2026-03,purchased,0.00
+credit_balance_at_list,MOCK,2026-03,consumed,-13175.00
+credit_balance_at_list,MOCK,2026-03,closing,60275.00
+credit_balance_at_list,MOCK,2026-03,closing x 0.80,48220.00
+credit_balance_at_list,MOCK,2026-03,GL 2400 balance,48220.00
+credit_balance_at_list,MOCK,2026-03,difference,0.00
+billed_ar,HOOD,2026-01,opening,0.00
+billed_ar,HOOD,2026-01,billed,3100.00
+billed_ar,HOOD,2026-01,cash,-3100.00
+billed_ar,HOOD,2026-01,credits,0.00
+billed_ar,HOOD,2026-01,closing,0.00
+billed_ar,HOOD,2026-01,GL 1100 balance,0.00
+billed_ar,HOOD,2026-01,difference,0.00
+billed_ar,HOOD,2026-02,opening,0.00
+billed_ar,HOOD,2026-02,billed,3225.00
+billed_ar,HOOD,2026-02,cash,0.00
+billed_ar,HOOD,2026-02,credits,0.00
+billed_ar,HOOD,2026-02,closing,3225.00
+billed_ar,HOOD,2026-02,GL 1100 balance,3225.00
+billed_ar,HOOD,2026-02,difference,0.00
+billed_ar,HOOD,2026-03,opening,3225.00
+billed_ar,HOOD,2026-03,billed,3265.00
+billed_ar,HOOD,2026-03,cash,-6490.00
+billed_ar,HOOD,2026-03,credits,0.00
+billed_ar,HOOD,2026-03,closing,0.00
+billed_ar,HOOD,2026-03,GL 1100 balance,0.00
+billed_ar,HOOD,2026-03,difference,0.00
+billed_ar,MOCK,2026-01,opening,0.00
+billed_ar,MOCK,2026-01,billed,80000.00
+billed_ar,MOCK,2026-01,cash,-80000.00
+billed_ar,MOCK,2026-01,credits,0.00
+billed_ar,MOCK,2026-01,closing,0.00
+billed_ar,MOCK,2026-01,GL 1100 balance,0.00
+billed_ar,MOCK,2026-01,difference,0.00
+billed_ar,MOCK,2026-02,opening,0.00
+billed_ar,MOCK,2026-02,billed,0.00
+billed_ar,MOCK,2026-02,cash,0.00
+billed_ar,MOCK,2026-02,credits,0.00
+billed_ar,MOCK,2026-02,closing,0.00
+billed_ar,MOCK,2026-02,GL 1100 balance,0.00
+billed_ar,MOCK,2026-02,difference,0.00
+billed_ar,MOCK,2026-03,opening,0.00
+billed_ar,MOCK,2026-03,billed,0.00
+billed_ar,MOCK,2026-03,cash,0.00
+billed_ar,MOCK,2026-03,credits,0.00
+billed_ar,MOCK,2026-03,closing,0.00
+billed_ar,MOCK,2026-03,GL 1100 balance,0.00
+billed_ar,MOCK,2026-03,difference,0.00
+billed_ar,TELA,2026-01,opening,0.00
+billed_ar,TELA,2026-01,billed,3800.00
+billed_ar,TELA,2026-01,cash,-3800.00
+billed_ar,TELA,2026-01,credits,0.00
+billed_ar,TELA,2026-01,closing,0.00
+billed_ar,TELA,2026-01,GL 1100 balance,0.00
+billed_ar,TELA,2026-01,difference,0.00
+billed_ar,TELA,2026-02,opening,0.00
+billed_ar,TELA,2026-02,billed,6450.00
+billed_ar,TELA,2026-02,cash,-4950.00
+billed_ar,TELA,2026-02,credits,-1500.00
+billed_ar,TELA,2026-02,closing,0.00
+billed_ar,TELA,2026-02,GL 1100 balance,0.00
+billed_ar,TELA,2026-02,difference,0.00
+billed_ar,TELA,2026-03,opening,0.00
+billed_ar,TELA,2026-03,billed,4700.00
+billed_ar,TELA,2026-03,cash,0.00
+billed_ar,TELA,2026-03,credits,0.00
+billed_ar,TELA,2026-03,closing,4700.00
+billed_ar,TELA,2026-03,GL 1100 balance,4700.00
+billed_ar,TELA,2026-03,difference,0.00
+billed_ar,ALL,2026-01,opening,0.00
+billed_ar,ALL,2026-01,billed,86900.00
+billed_ar,ALL,2026-01,cash,-86900.00
+billed_ar,ALL,2026-01,credits,0.00
+billed_ar,ALL,2026-01,closing,0.00
+billed_ar,ALL,2026-01,GL 1100 balance,0.00
+billed_ar,ALL,2026-01,difference,0.00
+billed_ar,ALL,2026-02,opening,0.00
+billed_ar,ALL,2026-02,billed,9675.00
+billed_ar,ALL,2026-02,cash,-4950.00
+billed_ar,ALL,2026-02,credits,-1500.00
+billed_ar,ALL,2026-02,closing,3225.00
+billed_ar,ALL,2026-02,GL 1100 balance,3225.00
+billed_ar,ALL,2026-02,difference,0.00
+billed_ar,ALL,2026-03,opening,3225.00
+billed_ar,ALL,2026-03,billed,7965.00
+billed_ar,ALL,2026-03,cash,-6490.00
+billed_ar,ALL,2026-03,credits,0.00
+billed_ar,ALL,2026-03,closing,4700.00
+billed_ar,ALL,2026-03,GL 1100 balance,4700.00
+billed_ar,ALL,2026-03,difference,0.00
+unbilled_ar,HOOD,2026-01,opening,3100.00
+unbilled_ar,HOOD,2026-01,accrued,3257.25
+unbilled_ar,HOOD,2026-01,invoiced,-3100.00
+unbilled_ar,HOOD,2026-01,closing,3257.25
+unbilled_ar,HOOD,2026-01,GL 1150 balance,3257.25
+unbilled_ar,HOOD,2026-01,difference,0.00
+unbilled_ar,HOOD,2026-02,opening,3257.25
+unbilled_ar,HOOD,2026-02,accrued,3265.00
+unbilled_ar,HOOD,2026-02,invoiced,-3225.00
+unbilled_ar,HOOD,2026-02,closing,3297.25
+unbilled_ar,HOOD,2026-02,GL 1150 balance,3297.25
+unbilled_ar,HOOD,2026-02,difference,0.00
+unbilled_ar,HOOD,2026-03,opening,3297.25
+unbilled_ar,HOOD,2026-03,accrued,3275.00
+unbilled_ar,HOOD,2026-03,invoiced,-3265.00
+unbilled_ar,HOOD,2026-03,closing,3307.25
+unbilled_ar,HOOD,2026-03,GL 1150 balance,3307.25
+unbilled_ar,HOOD,2026-03,difference,0.00
+unbilled_ar,MOCK,2026-01,opening,0.00
+unbilled_ar,MOCK,2026-01,accrued,0.00
+unbilled_ar,MOCK,2026-01,invoiced,0.00
+unbilled_ar,MOCK,2026-01,closing,0.00
+unbilled_ar,MOCK,2026-01,GL 1150 balance,0.00
+unbilled_ar,MOCK,2026-01,difference,0.00
+unbilled_ar,MOCK,2026-02,opening,0.00
+unbilled_ar,MOCK,2026-02,accrued,0.00
+unbilled_ar,MOCK,2026-02,invoiced,0.00
+unbilled_ar,MOCK,2026-02,closing,0.00
+unbilled_ar,MOCK,2026-02,GL 1150 balance,0.00
+unbilled_ar,MOCK,2026-02,difference,0.00
+unbilled_ar,MOCK,2026-03,opening,0.00
+unbilled_ar,MOCK,2026-03,accrued,0.00
+unbilled_ar,MOCK,2026-03,invoiced,0.00
+unbilled_ar,MOCK,2026-03,closing,0.00
+unbilled_ar,MOCK,2026-03,GL 1150 balance,0.00
+unbilled_ar,MOCK,2026-03,difference,0.00
+unbilled_ar,TELA,2026-01,opening,3800.00
+unbilled_ar,TELA,2026-01,accrued,6450.00
+unbilled_ar,TELA,2026-01,invoiced,-3800.00
+unbilled_ar,TELA,2026-01,closing,6450.00
+unbilled_ar,TELA,2026-01,GL 1150 balance,6450.00
+unbilled_ar,TELA,2026-01,difference,0.00
+unbilled_ar,TELA,2026-02,opening,6450.00
+unbilled_ar,TELA,2026-02,accrued,4700.00
+unbilled_ar,TELA,2026-02,invoiced,-6450.00
+unbilled_ar,TELA,2026-02,closing,4700.00
+unbilled_ar,TELA,2026-02,GL 1150 balance,4700.00
+unbilled_ar,TELA,2026-02,difference,0.00
+unbilled_ar,TELA,2026-03,opening,4700.00
+unbilled_ar,TELA,2026-03,accrued,4125.00
+unbilled_ar,TELA,2026-03,invoiced,-4700.00
+unbilled_ar,TELA,2026-03,closing,4125.00
+unbilled_ar,TELA,2026-03,GL 1150 balance,4125.00
+unbilled_ar,TELA,2026-03,difference,0.00
+unbilled_ar,ALL,2026-01,opening,6900.00
+unbilled_ar,ALL,2026-01,accrued,9707.25
+unbilled_ar,ALL,2026-01,invoiced,-6900.00
+unbilled_ar,ALL,2026-01,closing,9707.25
+unbilled_ar,ALL,2026-01,GL 1150 balance,9707.25
+unbilled_ar,ALL,2026-01,difference,0.00
+unbilled_ar,ALL,2026-02,opening,9707.25
+unbilled_ar,ALL,2026-02,accrued,7965.00
+unbilled_ar,ALL,2026-02,invoiced,-9675.00
+unbilled_ar,ALL,2026-02,closing,7997.25
+unbilled_ar,ALL,2026-02,GL 1150 balance,7997.25
+unbilled_ar,ALL,2026-02,difference,0.00
+unbilled_ar,ALL,2026-03,opening,7997.25
+unbilled_ar,ALL,2026-03,accrued,7400.00
+unbilled_ar,ALL,2026-03,invoiced,-7965.00
+unbilled_ar,ALL,2026-03,closing,7432.25
+unbilled_ar,ALL,2026-03,GL 1150 balance,7432.25
+unbilled_ar,ALL,2026-03,difference,0.00

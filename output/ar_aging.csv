@@ -1,0 +1,8 @@
+line,customer_id,invoice_id,issue_date,due_date,days_past_due,bucket,amount,current,1-30,31-60,61-90,over_90
+open_invoice,TELA,INV-2026-02-TELA,2026-03-03,2026-03-18,13,1-30,4700.00,0.00,4700.00,0.00,0.00,0.00
+total_billed_ar,,,,,,,4700.00,0.00,4700.00,0.00,0.00,0.00
+GL 1100 balance,,,,,,,4700.00,,,,,
+difference,,,,,,,0.00,,,,,
+memo: unbilled AR (not aged),,,,,,,7432.25,,,,,
+GL 1150 balance,,,,,,,7432.25,,,,,
+difference,,,,,,,0.00,,,,,
