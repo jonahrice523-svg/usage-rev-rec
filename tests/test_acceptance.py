@@ -157,6 +157,6 @@ def test_readme_links_point_to_files_that_exist():
     text = README.read_text(encoding="utf-8")
     root = README.parent
     for target in re.findall(r"\]\(([^)#]+)\)", text):
-        if target.startswith("http") or target == "MEMO.md":  # MEMO.md is Jonah's to write (step 11)
+        if target.startswith("http"):
             continue
         assert (root / target).exists(), target
