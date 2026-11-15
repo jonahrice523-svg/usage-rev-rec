@@ -221,6 +221,7 @@ INTRO = ("A full quarter of usage-based revenue accounting for a fictional compa
 ABOUT = ("Previously acting controller at a $16M ARR SaaS company, where I ran an accrued-revenue workflow for "
          "pay-as-you-go revenue, posted revenue from Chargebee into QuickBooks, and was the main contact for our "
          "auditors. Started at PwC in audit.")
+LINKEDIN = "https://www.linkedin.com/in/jonahrice/"
 
 
 def section_hero(f, sections):
@@ -477,6 +478,7 @@ def section_about():
   <p class="eyebrow">#N · About me</p>
   <h2>Jonah Rice, CPA</h2>
   <p>{esc(ABOUT)}</p>
+  <p class="small"><a href="{LINKEDIN}">LinkedIn →</a></p>
 </section>"""
 
 

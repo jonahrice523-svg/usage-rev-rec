@@ -18,7 +18,7 @@ import pytest
 import run
 from revrec.revenue import revenue_by
 from revrec.rollforwards import MONTHS, closing
-from revrec.site import ABOUT, INTRO, POSITIONS, REPO, memo_sections
+from revrec.site import ABOUT, INTRO, LINKEDIN, POSITIONS, REPO, memo_sections
 
 D = Decimal
 ROOT = Path(__file__).parent.parent
@@ -197,7 +197,11 @@ def test_no_spec_references_on_the_page(page):
 
 def test_about_me_and_footer(page):
     about = flat(re.search(r'<section id="about">.*?</section>', page, re.S).group(0))
-    assert about == "8 · About me Jonah Rice, CPA " + ABOUT
+    assert about == "8 · About me Jonah Rice, CPA " + ABOUT + " LinkedIn →"
+    assert re.findall(r'href="([^"]+)"', re.search(r'<section id="about">.*?</section>', page, re.S).group(0)) \
+        == [LINKEDIN]
+    assert "mailto:" not in page  # no email on the page
+    assert re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", page) is None
     assert "Jonah Rice, CPA" in flat(re.search(r"<footer>.*?</footer>", page, re.S).group(0))
 
 
@@ -280,8 +284,10 @@ def test_memo_figures_match_the_model(quarter):
 
 
 def test_links_point_to_the_repo(page):
+    """Every link goes to the repo, except the one LinkedIn link in About me."""
     for href in re.findall(r'href="([^"]+)"', page):
-        assert href.startswith(REPO), href
+        assert href.startswith(REPO) or href == LINKEDIN, href
+    assert page.count(f'href="{LINKEDIN}"') == 1
 
 
 def test_one_external_script_pinned_to_an_exact_version(page):
